@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<title>Rellotge estil estació suïssa</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #f4f2ec;
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .wrap {
+    display: flex;
+    gap: 3rem;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem;
+  }
+  .col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .clock-case {
+    background: #1c1c1c;
+    border-radius: 50%;
+    padding: 14px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  }
+  #digital {
+    font-size: 22px;
+    font-weight: 600;
+    color: #1c1c1c;
+  }
+  #dateline {
+    font-size: 14px;
+    color: #6b6b66;
+  }
+  #calHeader {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #1c1c1c;
+    text-transform: capitalize;
+  }
+  #calGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    text-align: center;
+    font-size: 14px;
+    min-width: 280px;
+    color: #1c1c1c;
+  }
+  #calGrid div { padding: 6px 0; border-radius: 6px; }
+  .dow { color: #9a9a94; font-weight: 600; }
+  .today { background: #d0102a; color: #ffffff; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="col">
+    <div class="clock-case">
+      <svg id="clock" viewBox="0 0 200 200" width="220" height="220" role="img" aria-label="Rellotge estil estació suïssa">
+        <circle cx="100" cy="100" r="96" fill="#ffffff" stroke="#1c1c1c" stroke-width="2"/>
+        <g id="ticks"></g>
+        <line id="hourHand" x1="100" y1="100" x2="100" y2="52" stroke="#1c1c1c" stroke-width="7" stroke-linecap="butt"/>
+        <line id="minHand" x1="100" y1="100" x2="100" y2="24" stroke="#1c1c1c" stroke-width="5" stroke-linecap="butt"/>
+        <g id="secGroup">
+          <line x1="100" y1="118" x2="100" y2="14" stroke="#d0102a" stroke-width="2"/>
+          <circle cx="100" cy="30" r="7" fill="#d0102a"/>
+        </g>
+        <circle cx="100" cy="100" r="5" fill="#1c1c1c"/>
+      </svg>
+    </div>
+    <div id="digital">--:--:--</div>
+    <div id="dateline">--</div>
+  </div>
+
+  <div class="col" style="align-items: stretch;">
+    <div id="calHeader">--</div>
+    <div id="calGrid"></div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var svgNS = "http://www.w3.org/2000/svg";
+  var ticks = document.getElementById('ticks');
+  for (var i = 0; i < 60; i++) {
+    var angle = i * 6 * Math.PI / 180;
+    var isHour = i % 5 === 0;
+    var r1 = isHour ? 72 : 84;
+    var w = isHour ? 6 : 3;
+    var len = isHour ? 20 : 8;
+    var x1 = 100 + r1 * Math.sin(angle), y1 = 100 - r1 * Math.cos(angle);
+    var x2 = 100 + (r1 + len) * Math.sin(angle), y2 = 100 - (r1 + len) * Math.cos(angle);
+    var line = document.createElementNS(svgNS, 'line');
+    line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+    line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+    line.setAttribute('stroke', '#1c1c1c');
+    line.setAttribute('stroke-width', w);
+    ticks.appendChild(line);
+  }
+
+  var diesSetmana = ["dg","dl","dt","dc","dj","dv","ds"];
+  var diesLlarg = ["diumenge","dilluns","dimarts","dimecres","dijous","divendres","dissabte"];
+  var mesos = ["gener","febrer","març","abril","maig","juny","juliol","agost","setembre","octubre","novembre","desembre"];
+
+  function buildCalendar(now) {
+    var year = now.getFullYear(), month = now.getMonth(), today = now.getDate();
+    document.getElementById('calHeader').textContent = mesos[month] + " " + year;
+    var grid = document.getElementById('calGrid');
+    grid.innerHTML = '';
+    diesSetmana.forEach(function(d){
+      var el = document.createElement('div');
+      el.textContent = d;
+      el.className = 'dow';
+      grid.appendChild(el);
+    });
+    var firstDay = new Date(year, month, 1).getDay();
+    var daysInMonth = new Date(year, month + 1, 0).getDate();
+    for (var i = 0; i < firstDay; i++) grid.appendChild(document.createElement('div'));
+    for (var d = 1; d <= daysInMonth; d++) {
+      var cell = document.createElement('div');
+      cell.textContent = d;
+      if (d === today) cell.className = 'today';
+      grid.appendChild(cell);
+    }
+  }
+
+  var lastDay = null;
+  function tick() {
+    var now = new Date();
+    var h = now.getHours() % 12, m = now.getMinutes(), s = now.getSeconds();
+    var hAngle = (h + m / 60) * 30;
+    var mAngle = (m + s / 60) * 6;
+    var sAngle = s * 6;
+    document.getElementById('hourHand').setAttribute('transform', 'rotate(' + hAngle + ' 100 100)');
+    document.getElementById('minHand').setAttribute('transform', 'rotate(' + mAngle + ' 100 100)');
+    document.getElementById('secGroup').setAttribute('transform', 'rotate(' + sAngle + ' 100 100)');
+
+    var pad = function(n){ return n < 10 ? '0' + n : n; };
+    document.getElementById('digital').textContent = pad(now.getHours()) + ':' + pad(m) + ':' + pad(s);
+    document.getElementById('dateline').textContent = diesLlarg[now.getDay()] + ', ' + now.getDate() + ' de ' + mesos[now.getMonth()] + ' de ' + now.getFullYear();
+
+    if (lastDay !== now.getDate()) {
+      lastDay = now.getDate();
+      buildCalendar(now);
+    }
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
+
+</body>
+</html>
