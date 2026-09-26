@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rellotge estil estació suïssa</title>
+<script>
+(function(){
+  try {
+    var manual = localStorage.getItem('domaineTemaManual');
+    var tema = manual;
+    if (tema !== 'clar' && tema !== 'fosc') {
+      var h = new Date().getHours();
+      tema = (h >= 7 && h < 20) ? 'clar' : 'fosc';
+    }
+    document.documentElement.setAttribute('data-theme', tema === 'clar' ? 'light' : 'dark');
+  } catch (e) {}
+})();
+</script>
+<style>
+  :root {
+    --bg: #000000;
+    --ombra-caixa: rgba(0,0,0,0.25);
+    --color-calhead: #ffffff;
+    --color-calgrid: #ffffff;
+    --color-dow: #8a8a86;
+    --color-instlabel: #8a8a86;
+    --color-instvalue: #ffffff;
+    --ctrl-fons: rgba(255,255,255,0.08);
+    --ctrl-vora: rgba(255,255,255,0.28);
+    --ctrl-icona: #ffffff;
+  }
+  html[data-theme="light"] {
+    --bg: #f4f2ec;
+    --ombra-caixa: rgba(0,0,0,0.18);
+    --color-calhead: #1c1c1c;
+    --color-calgrid: #1c1c1c;
+    --color-dow: #9a9a94;
+    --color-instlabel: #9a9a94;
+    --color-instvalue: #1c1c1c;
+    --ctrl-fons: rgba(0,0,0,0.05);
+    --ctrl-vora: rgba(0,0,0,0.18);
+    --ctrl-icona: #1c1c1c;
+  }
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    background: var(--bg);
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(0.5rem, 2vh, 1.5rem) clamp(0.75rem, 3vw, 1.5rem);
+    box-sizing: border-box;
+    min-height: 100dvh;
+  }
+  .wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(0.6rem, 2vh, 1.25rem);
+    width: 100%;
+    max-width: 420px;
+  }
+  .col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(8px, 1.6vh, 14px);
+    width: 100%;
+  }
+  .clock-case {
+    background: linear-gradient(135deg, #3a3a3a 0%, #1c1c1c 45%, #0a0a0a 100%);
+    border-radius: 50%;
+    padding: clamp(4px, 0.8vmin, 7px);
+    box-shadow: 0 6px 20px var(--ombra-caixa);
+  }
+
+  /* Mecanisme de gir horari: cara davantera (esfera) i cara posterior
+     (placa platejada amb la bandera suïssa), amb una capa negra intermitja
+     que evita que es vegi transparent pel lateral durant el gir. */
+  .clock-flip-wrap {
+    perspective: 1800px;
+  }
+  .clock-flip {
+    position: relative;
+    display: inline-block;
+    transform-style: preserve-3d;
+  }
+  .clock-flip.girant {
+    animation: girRellotge var(--gir-dur, 10s) cubic-bezier(.45,.05,.55,.95);
+  }
+  @keyframes girRellotge {
+    from { transform: rotateY(0deg); }
+    to   { transform: rotateY(360deg); }
+  }
+  .clock-edge {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3a3a3a 0%, #1c1c1c 45%, #0a0a0a 100%);
+  }
+  .clock-face-front {
+    position: relative;
+    transform: translateZ(20px);
+    backface-visibility: hidden;
+  }
+  .clock-face-back {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    transform: rotateY(180deg) translateZ(20px);
+    backface-visibility: hidden;
+    background: linear-gradient(135deg, #3a3a3a 0%, #1c1c1c 45%, #0a0a0a 100%);
+    padding: clamp(4px, 0.8vmin, 7px);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .clock-back-plate {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #f6f7f8 0%, #dde1e4 24%, #b4bac0 50%, #7d838a 76%, #45474b 100%);
+    box-shadow: inset 0 0 26px rgba(0,0,0,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .back-flag {
+    width: 50%;
+    height: 50%;
+    display: block;
+  }
+  #clock {
+    width: clamp(160px, 62vmin, 340px);
+    height: clamp(160px, 62vmin, 340px);
+    display: block;
+  }
+  #calHeader {
+    text-align: center;
+    font-size: clamp(19px, 4vmin, 30px);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: clamp(6px, 1vh, 14px);
+    color: var(--color-calhead);
+    text-transform: capitalize;
+  }
+  #calGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: clamp(4px, 1vmin, 10px);
+    text-align: center;
+    font-size: clamp(14px, 3vmin, 22px);
+    width: 100%;
+    color: var(--color-calgrid);
+  }
+  #calGrid div { padding: clamp(2px, 0.6vh, 7px) 0; border-radius: 6px; }
+  .dow { font-size: clamp(11px, 2.4vmin, 17px); letter-spacing: 0.5px; color: var(--color-dow); font-weight: 600; }
+  .today { background: #d0102a; color: #ffffff; font-weight: 600; }
+
+  /* Filera d'instruments: temperatura, altitud, humitat, localitzacio */
+  .instruments {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(6px, 1.4vmin, 10px) clamp(10px, 2.4vmin, 18px);
+    margin-top: 2px;
+  }
+  .instrument {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 52px;
+  }
+  .instLabel {
+    font-size: clamp(8px, 1.6vmin, 10px);
+    letter-spacing: 1px;
+    color: var(--color-instlabel);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .instValue {
+    font-size: clamp(11px, 2.1vmin, 14px);
+    font-weight: 600;
+    color: var(--color-instvalue);
+    margin-top: 2px;
+  }
+
+  /* Mobil en horitzontal: rellotge i calendari en linia, encara que l'amplada sigui inferior a 640px */
+  @media (orientation: landscape) and (max-height: 500px) {
+    body {
+      padding: clamp(0.25rem, 1.2vh, 0.75rem) clamp(0.5rem, 2vw, 1rem);
+    }
+    .wrap {
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      width: auto;
+      max-width: min(96vw, 820px);
+      gap: clamp(0.75rem, 3vw, 2rem);
+    }
+    .col {
+      width: auto;
+      gap: clamp(4px, 1vh, 8px);
+    }
+    #calGrid { min-width: clamp(170px, 30vw, 250px); }
+    #clock {
+      width: clamp(120px, 44vh, 250px);
+      height: clamp(120px, 44vh, 250px);
+    }
+    #calHeader { font-size: clamp(15px, 3.4vh, 21px); margin-bottom: clamp(3px, 0.8vh, 7px); }
+    #calGrid { font-size: clamp(11px, 2.6vh, 15px); gap: clamp(2px, 0.6vh, 5px); }
+    #calGrid div { padding: clamp(1px, 0.35vh, 3px) 0; }
+    .dow { font-size: clamp(8px, 1.9vh, 11px); }
+    .instruments { gap: clamp(3px, 0.8vh, 6px) clamp(6px, 1.8vw, 12px); margin-top: 0; }
+    .instLabel { font-size: clamp(7px, 1.3vh, 9px); }
+    .instValue { font-size: clamp(9px, 1.7vh, 12px); }
+  }
+
+  /* En pantalles mes amples (tauleta/escriptori estret), rellotge i calendari en linia */
+  @media (min-width: 640px) {
+    .wrap {
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: center;
+      max-width: 860px;
+      gap: clamp(1.5rem, 4vw, 3.5rem);
+    }
+    .col { width: auto; }
+    #calGrid { min-width: 300px; }
+  }
+
+  /* En pantalles grans d'escriptori, tot el conjunt creix */
+  @media (min-width: 1100px) and (min-height: 700px) {
+    .wrap {
+      max-width: min(92vw, 1600px);
+      gap: clamp(3rem, 6vw, 8rem);
+    }
+    #clock {
+      width: clamp(320px, 34vmin, 620px);
+      height: clamp(320px, 34vmin, 620px);
+    }
+    #calHeader { font-size: clamp(26px, 3.2vmin, 42px); margin-bottom: clamp(16px, 2vmin, 26px); }
+    #calGrid { font-size: clamp(18px, 2.6vmin, 32px); gap: clamp(8px, 1.2vmin, 16px); min-width: clamp(360px, 32vw, 620px); }
+    .dow { font-size: clamp(14px, 2vmin, 23px); }
+    .instLabel { font-size: clamp(11px, 1.2vmin, 14px); }
+    .instValue { font-size: clamp(15px, 1.8vmin, 20px); }
+    .instruments { gap: clamp(12px, 1.6vmin, 18px) clamp(20px, 2.6vmin, 32px); }
+  }
+
+  .sound-hint {
+    position: fixed;
+    left: 50%;
+    bottom: clamp(10px, 3vh, 24px);
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.72);
+    color: #fff;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: clamp(11px, 1.6vmin, 13px);
+    letter-spacing: 0.3px;
+    padding: 8px 18px;
+    border-radius: 999px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+    z-index: 50;
+  }
+  .sound-hint.visible { opacity: 1; }
+
+  .top-controls {
+    position: fixed;
+    top: clamp(8px, 2vh, 18px);
+    right: clamp(8px, 2vw, 18px);
+    display: flex;
+    gap: clamp(6px, 1.2vmin, 10px);
+    z-index: 60;
+  }
+  .ctrl-btn {
+    width: clamp(30px, 4.4vmin, 42px);
+    height: clamp(30px, 4.4vmin, 42px);
+    border-radius: 50%;
+    border: 1px solid var(--ctrl-vora);
+    background: var(--ctrl-fons);
+    color: var(--ctrl-icona);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+  .ctrl-btn:active { transform: scale(0.90); }
+  .ctrl-btn svg { width: 54%; height: 54%; display: block; }
+</style>
+</head>
+<body>
+<div class="top-controls">
+  <button type="button" class="ctrl-btn" id="themeBtn" aria-label="Canviar tema"></button>
+  <button type="button" class="ctrl-btn" id="soundBtn" aria-label="Activar o desactivar el so"></button>
+</div>
+
+<div class="wrap">
+
+  <div class="col">
+    <div class="clock-flip-wrap">
+     <div class="clock-flip" id="clockFlip">
+      <div class="clock-face-front">
+       <div class="clock-case">
+        <svg id="clock" viewBox="0 0 200 200" role="img" aria-label="Rellotge estil estació suïssa">
+        <defs>
+          <radialGradient id="faceGrad" cx="35%" cy="30%" r="75%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="70%" stop-color="#f7f7f5"/>
+            <stop offset="100%" stop-color="#e8e8e4"/>
+          </radialGradient>
+          <filter id="softShadow" x="-60%" y="-60%" width="220%" height="220%">
+            <feDropShadow dx="0" dy="1.1" stdDeviation="1" flood-color="#000000" flood-opacity="0.35"/>
+          </filter>
+        </defs>
+        <circle cx="100" cy="100" r="96" fill="url(#faceGrad)" stroke="#1c1c1c" stroke-width="2"/>
+        <g id="ticks" filter="url(#softShadow)"></g>
+        <text x="100" y="48" text-anchor="middle" font-family="'Mondaine Helvetica', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.8" font-weight="500" letter-spacing="1.03" fill="#1c1c1c">DOMAINE</text>
+        <g id="brandLogo" filter="url(#softShadow)">
+          <rect x="73.25" y="53.65" width="11.2" height="7.7" fill="#d52b1e"/>
+          <polygon points="78.85,55.05 78.85,59.95 73.95,57.5" fill="#ffffff"/>
+          <polygon points="78.85,55.05 78.85,59.95 83.75,57.5" fill="#ffffff"/>
+          <text x="86.55" y="59.95" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="5.25" font-weight="700" letter-spacing="0.28" fill="#1c1c1c">PSS MNN XML</text>
+        </g>
+        <rect id="hourHand" x="95.785" y="37" width="8.43" height="81" fill="#1c1c1c" filter="url(#softShadow)"/>
+        <polygon id="minHand" points="96.07,118 96.07,100 96.33,8 103.68,8 103.93,100 103.93,118" fill="#1c1c1c" filter="url(#softShadow)"/>
+        <g id="secGroup" filter="url(#softShadow)">
+          <line x1="100" y1="118" x2="100" y2="30" stroke="#d0102a" stroke-width="2"/>
+          <circle cx="100" cy="37" r="7" fill="#d0102a"/>
+        </g>
+        <circle cx="100" cy="100" r="5" fill="#1c1c1c" filter="url(#softShadow)"/>
+        <text id="altText" x="100" y="146" text-anchor="middle" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="7" font-weight="600" letter-spacing="0.3" fill="#1c1c1c">-- m</text>
+        </svg>
+       </div>
+      </div>
+      <div class="clock-face-back">
+       <div class="clock-back-plate">
+        <svg class="back-flag" viewBox="0 0 32 32" role="img" aria-label="Bandera de Suïssa">
+          <rect x="0" y="0" width="32" height="32" rx="16" fill="#d52b1e"/>
+          <rect x="13" y="6" width="6" height="20" fill="#ffffff"/>
+          <rect x="6" y="13" width="20" height="6" fill="#ffffff"/>
+        </svg>
+       </div>
+      </div>
+     </div>
+    </div>
+    <div class="instruments">
+      <div class="instrument">
+        <span class="instLabel">Temp</span>
+        <span id="instTemp" class="instValue">--°C</span>
+      </div>
+      <div class="instrument">
+        <span class="instLabel">Humit</span>
+        <span id="instHum" class="instValue">--%</span>
+      </div>
+      <div class="instrument">
+        <span class="instLabel">Tèrmica</span>
+        <span id="instFeels" class="instValue">--°C</span>
+      </div>
+      <div class="instrument">
+        <span class="instLabel">Lloc</span>
+        <span id="instLoc" class="instValue">--</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col" style="align-items: stretch;">
+    <div id="calHeader">--</div>
+    <div id="calGrid"></div>
+  </div>
+
+</div>
+
+<div class="sound-hint" id="soundHint">Toca la pantalla per activar el so del cucut</div>
+
+<script>
+(function(){
+  var svgNS = "http://www.w3.org/2000/svg";
+  var ticks = document.getElementById('ticks');
+  for (var i = 0; i < 60; i++) {
+    var angle = i * 6 * Math.PI / 180;
+    var isHour = i % 5 === 0;
+    var r1 = isHour ? 72 : 84;
+    var w = isHour ? 6 : 3;
+    var len = isHour ? 20 : 8;
+    var x1 = 100 + r1 * Math.sin(angle), y1 = 100 - r1 * Math.cos(angle);
+    var x2 = 100 + (r1 + len) * Math.sin(angle), y2 = 100 - (r1 + len) * Math.cos(angle);
+    var line = document.createElementNS(svgNS, 'line');
+    line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+    line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+    line.setAttribute('stroke', '#1c1c1c');
+    line.setAttribute('stroke-width', w);
+    ticks.appendChild(line);
+  }
+
+  var diesSetmana = ["dl","dt","dc","dj","dv","ds","dg"];
+  var diesLlarg = ["diumenge","dilluns","dimarts","dimecres","dijous","divendres","dissabte"];
+  var mesos = ["gener","febrer","març","abril","maig","juny","juliol","agost","setembre","octubre","novembre","desembre"];
+
+  function buildCalendar(now) {
+    var year = now.getFullYear(), month = now.getMonth(), today = now.getDate();
+    document.getElementById('calHeader').textContent = mesos[month] + " " + year;
+    var grid = document.getElementById('calGrid');
+    grid.innerHTML = '';
+    diesSetmana.forEach(function(d){
+      var el = document.createElement('div');
+      el.textContent = d;
+      el.className = 'dow';
+      grid.appendChild(el);
+    });
+    var firstDay = (new Date(year, month, 1).getDay() + 6) % 7;
+    var daysInMonth = new Date(year, month + 1, 0).getDate();
+    for (var i = 0; i < firstDay; i++) grid.appendChild(document.createElement('div'));
+    for (var d = 1; d <= daysInMonth; d++) {
+      var cell = document.createElement('div');
+      cell.textContent = d;
+      if (d === today) cell.className = 'today';
+      grid.appendChild(cell);
+    }
+  }
+
+  var lastDay = null;
+  var lastDigitalSecond = null;
+
+  function frame() {
+    var now = new Date();
+    var h = now.getHours() % 12, m = now.getMinutes();
+    var s = now.getSeconds();
+    var ms = now.getMilliseconds();
+    var sFrac = s + ms / 1000;
+
+    var sAngle;
+    if (sFrac < 58) {
+      sAngle = (sFrac / 58) * 360;
+    } else {
+      sAngle = 360;
+    }
+
+    var mAngle = m * 6;
+    var hAngle = (h + m / 60) * 30;
+
+    document.getElementById('hourHand').setAttribute('transform', 'rotate(' + hAngle + ' 100 100)');
+    document.getElementById('minHand').setAttribute('transform', 'rotate(' + mAngle + ' 100 100)');
+    document.getElementById('secGroup').setAttribute('transform', 'rotate(' + sAngle + ' 100 100)');
+
+    if (s !== lastDigitalSecond) {
+      lastDigitalSecond = s;
+      if (lastDay !== now.getDate()) {
+        lastDay = now.getDate();
+        buildCalendar(now);
+      }
+      checkHourlyChime(now);
+      aplicarTemaAutomatic();
+    }
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  /* Temperatura, humitat, altitud i localització, a partir de la geolocalització del dispositiu */
+  var instTemp = document.getElementById('instTemp');
+  var instFeels = document.getElementById('instFeels');
+  var instAlt = document.getElementById('altText');
+  var instHum = document.getElementById('instHum');
+  var instLoc = document.getElementById('instLoc');
+  var lastCoords = null;
+
+  function fetchWeather(lat, lon) {
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon + '&current=temperature_2m,relative_humidity_2m,apparent_temperature&daily=sunrise,sunset&timezone=auto')
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if (data && data.current) {
+          instTemp.textContent = Math.round(data.current.temperature_2m) + '°C';
+          instFeels.textContent = Math.round(data.current.apparent_temperature) + '°C';
+          instHum.textContent = Math.round(data.current.relative_humidity_2m) + '%';
+        }
+        if (data && data.daily && data.daily.sunrise && data.daily.sunset) {
+          sortidaSol = new Date(data.daily.sunrise[0]);
+          postaSol = new Date(data.daily.sunset[0]);
+          aplicarTemaAutomatic();
+        }
+      })
+      .catch(function(){});
+  }
+
+  function fetchElevation(lat, lon) {
+    fetch('https://api.open-meteo.com/v1/elevation?latitude=' + lat + '&longitude=' + lon)
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if (data && data.elevation && data.elevation.length) {
+          instAlt.textContent = Math.round(data.elevation[0]) + ' m';
+        }
+      })
+      .catch(function(){});
+  }
+
+  function fetchLocationName(lat, lon) {
+    fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=' + lat + '&longitude=' + lon + '&localityLanguage=ca')
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if (data) {
+          var name = data.locality || data.city || data.principalSubdivision || data.countryName || '--';
+          instLoc.textContent = name;
+        }
+      })
+      .catch(function(){});
+  }
+
+  function refreshAll(lat, lon) {
+    fetchWeather(lat, lon);
+    fetchElevation(lat, lon);
+    fetchLocationName(lat, lon);
+  }
+
+  function requestLocationAndData() {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      function(pos){
+        lastCoords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+        /* Si el dispositiu proporciona altitud GPS real (mòbils amb GPS), la fem servir en lloc de l'elevació del terreny */
+        if (pos.coords.altitude !== null && pos.coords.altitude !== undefined && !isNaN(pos.coords.altitude)) {
+          instAlt.textContent = Math.round(pos.coords.altitude) + ' m';
+        } else {
+          fetchElevation(lastCoords.lat, lastCoords.lon);
+        }
+        fetchWeather(lastCoords.lat, lastCoords.lon);
+        fetchLocationName(lastCoords.lat, lastCoords.lon);
+      },
+      function(){ /* permís denegat o error: es mantenen els guions */ },
+      { timeout: 10000, maximumAge: 600000 }
+    );
+  }
+
+
+  /* ---- Rellotge de campanades: gir horari + Mi als quarts, Do greu a les hores ---- */
+  var clockFlip = document.getElementById('clockFlip');
+
+  /* El gir en 3D nomes te dues cares (davant i darrere) separades per
+     l'eix Z; vistes de cantell (a mig gir) deixaven un buit transparent
+     entre elles. Ho arreglem apilant moltes capes negres intermedies
+     que omplen tot el gruix, com les parets d'un cilindre tancat. */
+  (function buildClosedCylinder(){
+    var depths = [];
+    for (var z = -19; z <= 19; z += 2) depths.push(z);
+    depths.forEach(function(z){
+      var layer = document.createElement('div');
+      layer.className = 'clock-edge';
+      layer.style.transform = 'translateZ(' + z + 'px)';
+      clockFlip.insertBefore(layer, clockFlip.firstChild);
+    });
+  })();
+
+  /* Tot el so del rellotge es sintetitza amb Web Audio API (cap arxiu
+     d'àudio incrustat): aixo el fa mes lleuger i evita qualsevol
+     problema de compatibilitat de descodificacio entre navegadors. */
+  var audioCtx = null;
+  function obtenirAudioCtx() {
+    if (!audioCtx) {
+      try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+      catch (e) { return null; }
+    }
+    if (audioCtx.state === 'suspended') { audioCtx.resume().catch(function(){}); }
+    return audioCtx;
+  }
+  function assegurarContextActiu() {
+    var ctx = obtenirAudioCtx();
+    if (!ctx) return Promise.resolve(null);
+    if (ctx.state === 'running') return Promise.resolve(ctx);
+    return ctx.resume().then(function () { return ctx; }).catch(function () { return ctx; });
+  }
+
+  /* Preferencia de so, recordada entre visites. Per defecte activat. */
+  var sonaActiu = true;
+  try { sonaActiu = localStorage.getItem('domaineSo') !== 'off'; } catch (e) {}
+
+  /* Notes de les campanades: Mi als quarts i Do greu a les hores,
+     l'interval mes harmonic per aquest us -una tercera major
+     descendent (Mi -> Do)-: càlid, dolç i melodic. */
+  var MI_FREQ = 329.63;  /* Mi4 (E4), quarts */
+  var DO_FREQ = 261.63;  /* Do4 (C4), "greu" respecte al Mi, hores */
+  var HORA_STEP = 0.85;  /* separacio (s) entre cada campanada de l'hora */
+
+  /* Campana sintetitzada: uns quants parcials no harmonics (relacions
+     no enteres entre si) que li donen aquell timbre metal·lic i càlid
+     d'una campana real, cada un apagant-se a un ritme una mica diferent. */
+  var PARCIALS_CAMPANA = [
+    { mul: 1.00, guany: 1.00, decaiment: 1.00 },
+    { mul: 2.01, guany: 0.55, decaiment: 0.85 },
+    { mul: 2.41, guany: 0.30, decaiment: 0.68 },
+    { mul: 3.04, guany: 0.16, decaiment: 0.52 },
+    { mul: 4.12, guany: 0.09, decaiment: 0.38 }
+  ];
+  function reproduirCampana(freqBase, ctxTime, guanyPic, durBase) {
+    var ctx = obtenirAudioCtx();
+    if (!ctx) return;
+    PARCIALS_CAMPANA.forEach(function (p) {
+      var osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = freqBase * p.mul;
+      var g = ctx.createGain();
+      var pic = guanyPic * p.guany;
+      var dur = durBase * p.decaiment;
+      g.gain.setValueAtTime(0.0001, ctxTime);
+      g.gain.linearRampToValueAtTime(pic, ctxTime + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0004, ctxTime + dur);
+      osc.connect(g);
+      g.connect(ctx.destination);
+      osc.start(ctxTime);
+      osc.stop(ctxTime + dur + 0.05);
+    });
+  }
+
+  /* "Cloc" mecanic sintetitzat: un breu impacte de soroll filtrat (el
+     "clic" del pestell) mes un cop de triangle greu (el "clonc" del
+     mecanisme en assentar-se). Marca l'instant exacte en que el gir
+     s'atura i l'esfera torna a mirar cap endavant. */
+  function reproduirCloc() {
+    if (!sonaActiu) return;
+    var ctx = obtenirAudioCtx();
+    if (!ctx) return;
+    var quan = ctx.currentTime;
+    var midaBufer = Math.max(1, Math.floor(ctx.sampleRate * 0.015));
+    var buffer = ctx.createBuffer(1, midaBufer, ctx.sampleRate);
+    var dades = buffer.getChannelData(0);
+    for (var i = 0; i < midaBufer; i++) {
+      dades[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / midaBufer, 1.5);
+    }
+    var src = ctx.createBufferSource();
+    src.buffer = buffer;
+    var filtre = ctx.createBiquadFilter();
+    filtre.type = 'lowpass';
+    filtre.frequency.value = 1800;
+    var gainClic = ctx.createGain();
+    gainClic.gain.value = 0.5;
+    src.connect(filtre);
+    filtre.connect(gainClic);
+    gainClic.connect(ctx.destination);
+    src.start(quan);
+    src.stop(quan + 0.02);
+
+    var osc = ctx.createOscillator();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(180, quan);
+    osc.frequency.exponentialRampToValueAtTime(60, quan + 0.12);
+    var gainThump = ctx.createGain();
+    gainThump.gain.setValueAtTime(0.0001, quan);
+    gainThump.gain.linearRampToValueAtTime(0.5, quan + 0.008);
+    gainThump.gain.exponentialRampToValueAtTime(0.0008, quan + 0.22);
+    osc.connect(gainThump);
+    gainThump.connect(ctx.destination);
+    osc.start(quan);
+    osc.stop(quan + 0.25);
+  }
+
+  var soundHint = document.getElementById('soundHint');
+  var soundHintTimer = null;
+  function mostrarAvisSo() {
+    if (!soundHint) return;
+    soundHint.classList.add('visible');
+    if (soundHintTimer) clearTimeout(soundHintTimer);
+    soundHintTimer = setTimeout(function () {
+      soundHint.classList.remove('visible');
+    }, 6000);
+  }
+  function amagarAvisSo() {
+    if (!soundHint) return;
+    soundHint.classList.remove('visible');
+    if (soundHintTimer) { clearTimeout(soundHintTimer); soundHintTimer = null; }
+  }
+
+  /* Molts navegadors bloquegen l'àudio si encara no hi ha hagut cap
+     interacció amb la pàgina, i tambe el suspenen sols si porta una
+     estona sense sonar res (per estalviar bateria). Aprofitem el
+     primer toc o tecla -o el boto del so- per despertar-lo. */
+  function unlockAudio() {
+    amagarAvisSo();
+    assegurarContextActiu();
+  }
+  document.addEventListener('pointerdown', unlockAudio, { once: true });
+  document.addEventListener('keydown', unlockAudio, { once: true });
+
+  /* Campanada dels quarts: un sol toc de Mi, sense gir de l'esfera
+     -nomes l'hora en punt fa girar el mecanisme. */
+  function tocarQuart() {
+    if (!sonaActiu) { return; }
+    assegurarContextActiu().then(function (ctx) {
+      if (!ctx || ctx.state !== 'running') { mostrarAvisSo(); return; }
+      reproduirCampana(MI_FREQ, ctx.currentTime + 0.03, 0.5, 1.3);
+    });
+  }
+
+  /* Campanades de l'hora: tantes campanades de Do greu com toca
+     l'hora (format de 12), espaiades a un ritme clar i pausat. */
+  function tocarHores(count) {
+    if (!sonaActiu) return;
+    assegurarContextActiu().then(function (ctx) {
+      if (!ctx || ctx.state !== 'running') { mostrarAvisSo(); return; }
+      var t0 = ctx.currentTime + 0.05;
+      for (var i = 0; i < count; i++) {
+        reproduirCampana(DO_FREQ, t0 + i * HORA_STEP, 0.62, 1.5);
+      }
+    });
+  }
+
+  /* El gir sempre dura 10 segons exactes, independentment de quantes
+     campanades toquin (com molt, a les 12, la sequencia de campanades
+     dura uns 9,4s, de manera que sempre acaba abans que el gir
+     s'aturi). El "cloc" final es reprodueix a l'animationend, així
+     que sempre coincideix amb el final real del gir. */
+  var SPIN_MS = 10000;
+
+  function spinAndChime(count) {
+    if (!clockFlip || clockFlip.classList.contains('girant')) return;
+    clockFlip.style.setProperty('--gir-dur', (SPIN_MS / 1000) + 's');
+    tocarHores(count);
+    clockFlip.classList.add('girant');
+  }
+
+  clockFlip.addEventListener('animationend', function () {
+    clockFlip.classList.remove('girant');
+    reproduirCloc();
+  });
+
+  /* Toca als quarts i a les hores en punt, com un rellotge de torre
+     real. La pàgina només actualitza el rellotge quan la pestanya és
+     visible i activa (el navegador pausa requestAnimationFrame en
+     segon pla), així que si el mòbil estava bloquejat o la pestanya
+     en segon pla exactament al quart o a l'hora en punt, es podria
+     perdre l'instant exacte. Per cobrir-ho: 1) donem un marge de 20
+     segons en lloc d'exigir el segon 0 exacte, 2) en recuperar el
+     focus de la pestanya, comprovem si acabem de passar un quart o
+     una hora sense haver tocat encara. Si el dispositiu ha estat
+     inactiu mes d'aquest marge (p. ex. tota la nit), aquell toc
+     concret es perd igualment: no hi ha manera d'executar codi de
+     pàgina mentre la pestanya està totalment aturada. */
+  var lastChimedKey = null;
+  var MARGE_TOC_S = 20;
+  function clauMinut(now) {
+    return now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate() + '-' + now.getHours() + '-' + now.getMinutes();
+  }
+  function comptaCucuts(hh) {
+    var count = hh % 12;
+    return count === 0 ? 12 : count;
+  }
+  function checkHourlyChime(now) {
+    var mm = now.getMinutes();
+    if (mm !== 0 && mm !== 15 && mm !== 30 && mm !== 45) return;
+    if (now.getSeconds() >= MARGE_TOC_S) return;
+    var key = clauMinut(now);
+    if (lastChimedKey === key) return;
+    lastChimedKey = key;
+    if (mm === 0) {
+      spinAndChime(comptaCucuts(now.getHours()));
+    } else {
+      tocarQuart();
+    }
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible') checkHourlyChime(new Date());
+  });
+
+  /* Boto per activar/desactivar el so */
+  var soundBtn = document.getElementById('soundBtn');
+  var ICONA_SO_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
+  var ICONA_SO_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16 9l5 6M21 9l-5 6"/></svg>';
+  function actualitzarIconaSo() {
+    if (!soundBtn) return;
+    soundBtn.innerHTML = sonaActiu ? ICONA_SO_ON : ICONA_SO_OFF;
+    soundBtn.setAttribute('aria-label', sonaActiu ? 'Desactivar el so' : 'Activar el so');
+    soundBtn.setAttribute('aria-pressed', sonaActiu ? 'true' : 'false');
+  }
+  actualitzarIconaSo();
+  if (soundBtn) {
+    soundBtn.addEventListener('click', function () {
+      sonaActiu = !sonaActiu;
+      try { localStorage.setItem('domaineSo', sonaActiu ? 'on' : 'off'); } catch (e) {}
+      actualitzarIconaSo();
+      if (sonaActiu) { unlockAudio(); }
+      else { amagarAvisSo(); }
+    });
+  }
+
+  /* Boto de tema: fons clar de dia, fosc de nit. Per defecte es calcula
+     automaticament a partir de la sortida/posta de sol reals del lloc
+     (un cop es coneix la ubicacio); fins aleshores, o si l'usuari ha
+     triat manualment amb aquest boto, es fa servir aquesta preferencia
+     en lloc de l'automatica. */
+  var themeBtn = document.getElementById('themeBtn');
+  var sortidaSol = null, postaSol = null;
+  var ICONA_SOL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v3M12 18.5v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2.5 12h3M18.5 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>';
+  var ICONA_LLUNA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5z"/></svg>';
+  function actualitzarIconaTema(tema) {
+    if (!themeBtn) return;
+    themeBtn.innerHTML = tema === 'clar' ? ICONA_LLUNA : ICONA_SOL;
+    themeBtn.setAttribute('aria-label', tema === 'clar' ? 'Activar el fons fosc' : 'Activar el fons clar');
+  }
+  function aplicarTema(tema) {
+    document.documentElement.setAttribute('data-theme', tema === 'clar' ? 'light' : 'dark');
+    actualitzarIconaTema(tema);
+  }
+  function temaActual() {
+    return document.documentElement.getAttribute('data-theme') === 'light' ? 'clar' : 'fosc';
+  }
+  function aplicarTemaAutomatic() {
+    var manual = null;
+    try { manual = localStorage.getItem('domaineTemaManual'); } catch (e) {}
+    if (manual === 'clar' || manual === 'fosc') return;
+    if (!sortidaSol || !postaSol) return;
+    var ara = new Date();
+    aplicarTema((ara >= sortidaSol && ara < postaSol) ? 'clar' : 'fosc');
+  }
+  actualitzarIconaTema(temaActual());
+  if (themeBtn) {
+    themeBtn.addEventListener('click', function () {
+      var nou = temaActual() === 'clar' ? 'fosc' : 'clar';
+      try { localStorage.setItem('domaineTemaManual', nou); } catch (e) {}
+      aplicarTema(nou);
+    });
+  }
+
+  requestLocationAndData();
+  setInterval(function(){
+    if (lastCoords) refreshAll(lastCoords.lat, lastCoords.lon);
+    else requestLocationAndData();
+  }, 15 * 60 * 1000);
+})();
+</script>
+
+</body>
+</html>
