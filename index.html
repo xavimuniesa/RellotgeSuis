@@ -380,12 +380,12 @@
         <circle cx="100" cy="100" r="93.4" fill="none" stroke="url(#bezelGrad)" stroke-width="2.2"/>
         <ellipse cx="62" cy="54" rx="50" ry="36" fill="url(#glassHi)" transform="rotate(-18 62 54)"/>
         <g id="ticks" filter="url(#softShadow)"></g>
-        <text x="100" y="48" text-anchor="middle" font-family="'Mondaine Helvetica', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.8" font-weight="500" letter-spacing="1.03" fill="#1c1c1c">MONDAINE</text>
+        <text x="100" y="48" text-anchor="middle" font-family="'Mondaine Helvetica', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.8" font-weight="500" letter-spacing="1.03" fill="#1c1c1c">DOMAINE</text>
         <g id="brandLogo" filter="url(#softShadow)">
           <rect x="73.25" y="53.65" width="11.2" height="7.7" fill="#d52b1e"/>
           <polygon points="78.85,55.05 78.85,59.95 73.95,57.5" fill="#ffffff"/>
           <polygon points="78.85,55.05 78.85,59.95 83.75,57.5" fill="#ffffff"/>
-          <text x="86.55" y="59.95" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="5.25" font-weight="700" letter-spacing="0.28" fill="#1c1c1c">SBB CFF FSS</text>
+          <text x="86.55" y="59.95" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="5.25" font-weight="700" letter-spacing="0.28" fill="#1c1c1c">PSS MNN XML</text>
         </g>
         <g id="dataWindows">
           <rect x="134" y="86" width="34" height="13" fill="url(#winFloor)" stroke="#1c1c1c" stroke-width="1.1" filter="url(#winInset)"/>
@@ -467,6 +467,32 @@
   var nomFestius = {};
   var anysFestiusCarregats = {};
 
+  /* Alguns festius de data fixa desapareixen del calendari laboral oficial quan cauen en
+     diumenge (ja es festiu de per si, no genera dia inhabil extra), tot i que la festa
+     existeix igualment (p.ex. Tots Sants 2026, que cau en diumenge). Els garantim aqui com
+     a reforç, sense sobreescriure mai el nom que arribi de l'administracio. */
+  var FESTIUS_FIXOS = {
+    '01-01': "Cap d'Any",
+    '01-06': 'Reis',
+    '05-01': 'Festa del Treball',
+    '06-24': 'Sant Joan',
+    '08-15': "L'Assumpció",
+    '09-11': 'Diada Nacional de Catalunya',
+    '10-12': "Festa Nacional d'Espanya",
+    '11-01': 'Tots Sants',
+    '12-06': 'Dia de la Constitució',
+    '12-08': 'La Immaculada',
+    '12-25': 'Nadal',
+    '12-26': 'Sant Esteve'
+  };
+
+  function aplicaFestiusFixos(any) {
+    Object.keys(FESTIUS_FIXOS).forEach(function(md){
+      var key = any + '-' + md;
+      if (!nomFestius[key]) nomFestius[key] = FESTIUS_FIXOS[md];
+    });
+  }
+
   function dataToKey(dataIso) { return dataIso.slice(0, 10); }
 
   function fetchFestius(any) {
@@ -496,6 +522,7 @@
 
   /* Demana els festius d'un any nomes la primera vegada que cal mostrar-lo (en navegar pel calendari) */
   function assegurarFestius(any) {
+    aplicaFestiusFixos(any);
     if (!anysFestiusCarregats[any]) {
       anysFestiusCarregats[any] = true;
       fetchFestius(any);
@@ -529,9 +556,9 @@
   window.addEventListener('resize', amagaFestiuTip);
 
   /* Desplaçament (en mesos) respecte al mes real, controlat en lliscar el calendari.
-     Limitat als 2 mesos anteriors i els 2 mesos posteriors. */
+     Limitat als 4 mesos anteriors i els 4 mesos posteriors. */
   var mesOffset = 0;
-  var MES_OFFSET_MIN = -2, MES_OFFSET_MAX = 2;
+  var MES_OFFSET_MIN = -4, MES_OFFSET_MAX = 4;
 
   function buildCalendar(realNow) {
     amagaFestiuTip();
@@ -573,7 +600,7 @@
     }
   }
 
-  /* Lliscar el calendari a dreta o esquerra per veure els 2 mesos anteriors o posteriors */
+  /* Lliscar el calendari a dreta o esquerra per veure els 4 mesos anteriors o posteriors */
   function canviaMes(delta) {
     var nou = mesOffset + delta;
     if (nou < MES_OFFSET_MIN || nou > MES_OFFSET_MAX) return;
