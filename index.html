@@ -158,13 +158,34 @@
   }
   #calHeader {
     flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(4px, 1vw, 10px);
     text-align: center;
     font-size: clamp(19px, 4vmin, 30px);
     font-weight: 600;
     letter-spacing: 0.5px;
     color: var(--color-calhead);
-    text-transform: capitalize;
   }
+  #calHeaderText { text-transform: capitalize; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .avui-btn {
+    flex: none;
+    width: clamp(16px, 2.6vmin, 22px);
+    height: clamp(16px, 2.6vmin, 22px);
+    border: none;
+    background: transparent;
+    color: var(--color-dow);
+    padding: 0;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .avui-btn.visible { display: flex; }
+  .avui-btn svg { width: 100%; height: 100%; }
+  .avui-btn:active { transform: scale(0.88); }
   #calGrid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -380,12 +401,12 @@
         <circle cx="100" cy="100" r="93.4" fill="none" stroke="url(#bezelGrad)" stroke-width="2.2"/>
         <ellipse cx="62" cy="54" rx="50" ry="36" fill="url(#glassHi)" transform="rotate(-18 62 54)"/>
         <g id="ticks" filter="url(#softShadow)"></g>
-        <text x="100" y="48" text-anchor="middle" font-family="'Mondaine Helvetica', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.8" font-weight="500" letter-spacing="1.03" fill="#1c1c1c">MONDAINE</text>
+        <text x="100" y="48" text-anchor="middle" font-family="'Mondaine Helvetica', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.8" font-weight="500" letter-spacing="1.03" fill="#1c1c1c">DOMAINE</text>
         <g id="brandLogo" filter="url(#softShadow)">
           <rect x="73.25" y="53.65" width="11.2" height="7.7" fill="#d52b1e"/>
           <polygon points="78.85,55.05 78.85,59.95 73.95,57.5" fill="#ffffff"/>
           <polygon points="78.85,55.05 78.85,59.95 83.75,57.5" fill="#ffffff"/>
-          <text x="86.55" y="59.95" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="5.25" font-weight="700" letter-spacing="0.28" fill="#1c1c1c">SBB CFF FFS</text>
+          <text x="86.55" y="59.95" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="5.25" font-weight="700" letter-spacing="0.28" fill="#1c1c1c">PSS MNN XML</text>
         </g>
         <g id="dataWindows">
           <rect x="134" y="86" width="34" height="13" fill="url(#winFloor)" stroke="#1c1c1c" stroke-width="1.1" filter="url(#winInset)"/>
@@ -420,7 +441,12 @@
   <div class="col" style="align-items: stretch;">
     <div class="cal-header-row">
       <button type="button" class="ctrl-btn" id="themeBtn" aria-label="Canviar tema"></button>
-      <div id="calHeader">--</div>
+      <div id="calHeader">
+        <span id="calHeaderText">--</span>
+        <button type="button" id="avuiBtn" class="avui-btn" aria-label="Tornar al mes actual" title="Tornar al mes actual">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 9 8 9"/></svg>
+        </button>
+      </div>
       <button type="button" class="ctrl-btn" id="soundBtn" aria-label="Activar o desactivar el so"></button>
     </div>
     <div id="calGrid"></div>
@@ -556,9 +582,8 @@
   window.addEventListener('resize', amagaFestiuTip);
 
   /* Desplaçament (en mesos) respecte al mes real, controlat en lliscar el calendari.
-     Limitat als 4 mesos anteriors i els 4 mesos posteriors. */
+     Sense limit en cap sentit. */
   var mesOffset = 0;
-  var MES_OFFSET_MIN = -4, MES_OFFSET_MAX = 4;
 
   function buildCalendar(realNow) {
     amagaFestiuTip();
@@ -566,7 +591,8 @@
     var view = new Date(realNow.getFullYear(), realNow.getMonth() + mesOffset, 1);
     var year = view.getFullYear(), month = view.getMonth();
     assegurarFestius(year);
-    document.getElementById('calHeader').textContent = mesos[month] + " " + year;
+    document.getElementById('calHeaderText').textContent = mesos[month] + " " + year;
+    document.getElementById('avuiBtn').classList.toggle('visible', mesOffset !== 0);
     var grid = document.getElementById('calGrid');
     grid.innerHTML = '';
     diesSetmana.forEach(function(d){
@@ -600,14 +626,11 @@
     }
   }
 
-  /* Lliscar el calendari a dreta o esquerra per veure els 4 mesos anteriors o posteriors */
-  function canviaMes(delta) {
-    var nou = mesOffset + delta;
-    if (nou < MES_OFFSET_MIN || nou > MES_OFFSET_MAX) return;
-    mesOffset = nou;
+  /* Anima el canvi de mes (lliscament visual) i torna a construir el calendari */
+  function animaICanvia(direccioSigne) {
     var grid = document.getElementById('calGrid');
     grid.style.transition = 'none';
-    grid.style.transform = 'translateX(' + (delta > 0 ? '16px' : '-16px') + ')';
+    grid.style.transform = 'translateX(' + (direccioSigne > 0 ? '16px' : '-16px') + ')';
     grid.style.opacity = '0.25';
     buildCalendar(new Date());
     requestAnimationFrame(function(){
@@ -617,6 +640,20 @@
         grid.style.opacity = '1';
       });
     });
+  }
+
+  /* Lliscar el calendari a dreta o esquerra: sense limit de mesos */
+  function canviaMes(delta) {
+    mesOffset += delta;
+    animaICanvia(delta);
+  }
+
+  /* Tornar directament al mes actual: boto "avui" o doble toc al nom del mes */
+  function tornaMesActual() {
+    if (mesOffset === 0) return;
+    var direccio = mesOffset > 0 ? -1 : 1;
+    mesOffset = 0;
+    animaICanvia(direccio);
   }
 
   (function initSwipeCalendari(){
@@ -634,6 +671,18 @@
     grid.addEventListener('pointerdown', function(e){ inici(e.clientX, e.clientY); });
     grid.addEventListener('pointerup', function(e){ final(e.clientX, e.clientY); });
     grid.addEventListener('pointercancel', function(){ actiu = false; });
+  })();
+
+  /* Tornar al mes actual: boto dedicat, o doble toc al nom del mes (a qualsevol mes on siguem) */
+  document.getElementById('avuiBtn').addEventListener('click', tornaMesActual);
+  (function initDobleTocMes(){
+    var text = document.getElementById('calHeaderText');
+    var ultimToc = 0;
+    text.addEventListener('click', function(){
+      var ara = Date.now();
+      if (ara - ultimToc < 400) { tornaMesActual(); ultimToc = 0; }
+      else { ultimToc = ara; }
+    });
   })();
 
   var lastDay = null;
