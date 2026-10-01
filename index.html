@@ -8,6 +8,9 @@
 (function(){
   try {
     var manual = localStorage.getItem('domaineTemaManual');
+    /* L'elecció manual caduca a la següent sortida o posta de sol */
+    var fins = parseInt(localStorage.getItem('domaineTemaManualFins'), 10);
+    if (!fins || Date.now() >= fins) manual = null;
     var tema = manual;
     if (tema !== 'clar' && tema !== 'fosc') {
       var h = new Date().getHours();
@@ -80,6 +83,69 @@
     gap: clamp(8px, 1.6vh, 14px);
     width: 100%;
   }
+
+  /* Franja d'indicadors (poblacio, temperatura, alertes, humitat, sensacio, altitud):
+     una sola linia horitzontal, sempre desplaçable amb el dit o arrossegant amb el mouse.
+     En vertical queda entre el rellotge i el calendari; en horitzontal, a la columna del
+     mig, alineada a dalt amb el calendari. */
+  .indicators-col {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .indicators-strip {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: clamp(16px, 4vw, 30px);
+    overflow-x: auto;
+    overflow-y: hidden;
+    width: 100%;
+    max-width: 100%;
+    padding: clamp(2px, 0.6vh, 6px) 2px clamp(6px, 1.2vh, 10px);
+    touch-action: pan-x;
+    cursor: grab;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .indicators-strip::-webkit-scrollbar { display: none; }
+  .indicators-strip.arrossegant { cursor: grabbing; }
+  /* Difuminat als extrems quan hi ha més indicadors amagats, per indicar que es pot lliscar */
+  .indicators-strip.fade-r {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+            mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  }
+  .indicators-strip.fade-l {
+    -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 28px), transparent);
+            mask-image: linear-gradient(to left, #000 calc(100% - 28px), transparent);
+  }
+  .indicators-strip.fade-l.fade-r {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+            mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+  }
+  .indicator-chip {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    white-space: nowrap;
+  }
+  .indicator-chip .valor {
+    font-size: clamp(13px, 3vmin, 19px);
+    font-weight: 700;
+    color: var(--color-instvalue);
+  }
+  .indicator-chip .etiqueta {
+    font-size: clamp(9px, 1.9vmin, 12px);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--color-instlabel);
+    margin-top: 2px;
+  }
+  .indicator-chip.alerta .valor { color: var(--bg-festiu); }
+
   .clock-case {
     background: linear-gradient(135deg, #3a3a3a 0%, #1c1c1c 45%, #0a0a0a 100%);
     border-radius: 50%;
@@ -168,7 +234,7 @@
     letter-spacing: 0.5px;
     color: var(--color-calhead);
   }
-  #calHeaderText { text-transform: capitalize; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  #calHeaderText { text-transform: capitalize; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
   .avui-btn {
     flex: none;
     width: clamp(16px, 2.6vmin, 22px);
@@ -254,6 +320,14 @@
       width: auto;
       gap: clamp(4px, 1vh, 8px);
     }
+    .col-calendari { align-self: flex-start; }
+    .indicators-col {
+      width: clamp(80px, 20vw, 160px);
+      align-self: flex-start;
+    }
+    .indicators-strip { gap: clamp(10px, 2.5vw, 18px); }
+    .indicator-chip .valor { font-size: clamp(10px, 2.6vh, 14px); }
+    .indicator-chip .etiqueta { font-size: clamp(7px, 1.6vh, 9px); }
     #calGrid { min-width: clamp(170px, 30vw, 250px); }
     #clock {
       width: clamp(150px, 66vh, 360px);
@@ -275,6 +349,7 @@
       gap: clamp(1.5rem, 4vw, 3.5rem);
     }
     .col { width: auto; }
+    .indicators-col { width: clamp(110px, 16vw, 220px); }
     #calGrid { min-width: 300px; }
     #clock {
       width: clamp(220px, 46vmin, 480px);
@@ -285,9 +360,12 @@
   /* En pantalles grans d'escriptori, tot el conjunt creix */
   @media (min-width: 1100px) and (min-height: 700px) {
     .wrap {
-      max-width: min(92vw, 1600px);
-      gap: clamp(3rem, 6vw, 8rem);
+      max-width: min(96vw, 2000px);
+      gap: clamp(2rem, 5vw, 6rem);
     }
+    .indicators-col { width: clamp(120px, 15vw, 240px); }
+    .indicator-chip .valor { font-size: clamp(16px, 1.8vw, 24px); }
+    .indicator-chip .etiqueta { font-size: clamp(11px, 1vw, 14px); }
     #clock {
       width: clamp(360px, 50vmin, 760px);
       height: clamp(360px, 50vmin, 760px);
@@ -380,21 +458,8 @@
             <stop offset="0%" stop-color="#ffffff" stop-opacity="0.30"/>
             <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
           </radialGradient>
-          <linearGradient id="winFloor" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#d6d6d1"/>
-            <stop offset="35%" stop-color="#fbfbfa"/>
-            <stop offset="100%" stop-color="#ffffff"/>
-          </linearGradient>
           <filter id="softShadow" x="-60%" y="-60%" width="220%" height="220%">
             <feDropShadow dx="0" dy="1.1" stdDeviation="1" flood-color="#000000" flood-opacity="0.35"/>
-          </filter>
-          <filter id="winInset" x="-60%" y="-60%" width="220%" height="220%">
-            <feOffset dx="0" dy="0.7" in="SourceAlpha" result="off"/>
-            <feGaussianBlur in="off" stdDeviation="0.6" result="blur"/>
-            <feComposite in="SourceGraphic" in2="blur" operator="out" result="inv"/>
-            <feFlood flood-color="#000000" flood-opacity="0.5" result="color"/>
-            <feComposite in="color" in2="inv" operator="in" result="shadowInner"/>
-            <feComposite in="shadowInner" in2="SourceGraphic" operator="over"/>
           </filter>
         </defs>
         <circle cx="100" cy="100" r="96" fill="url(#faceGrad)" stroke="#1c1c1c" stroke-width="2"/>
@@ -408,13 +473,10 @@
           <polygon points="78.85,55.05 78.85,59.95 83.75,57.5" fill="#ffffff"/>
           <text x="86.55" y="59.95" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="5.25" font-weight="700" letter-spacing="0.28" fill="#1c1c1c">PSS MNN XML</text>
         </g>
-        <g id="dataWindows">
-          <rect x="134" y="86" width="34" height="13" fill="url(#winFloor)" stroke="#1c1c1c" stroke-width="1.1" filter="url(#winInset)"/>
-          <rect x="134" y="101" width="34" height="13" fill="url(#winFloor)" stroke="#1c1c1c" stroke-width="1.1" filter="url(#winInset)"/>
-          <text id="instTemp" x="151" y="95.5" text-anchor="middle" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="8" font-weight="700" fill="#1c1c1c">--°C</text>
-          <text id="altText" x="151" y="110.5" text-anchor="middle" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="8" font-weight="700" fill="#1c1c1c">-- m</text>
-        </g>
-        <text id="instLoc" x="100" y="140" text-anchor="middle" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9" font-weight="700" letter-spacing="0.15" fill="#1c1c1c">--</text>
+        <text id="republicaText" x="100" text-anchor="middle" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" fill="#1c1c1c">
+          <tspan id="republicaLinia1" x="100" y="138" font-size="15" font-weight="800" letter-spacing="0.4"></tspan>
+          <tspan id="republicaLinia2" x="100" y="150" font-size="7.5" font-weight="700" letter-spacing="0.3"></tspan>
+        </text>
         <rect id="hourHand" x="95.785" y="37" width="8.43" height="81" fill="#1c1c1c" filter="url(#softShadow)"/>
         <polygon id="minHand" points="96.07,118 96.07,100 96.33,8 103.68,8 103.93,100 103.93,118" fill="#1c1c1c" filter="url(#softShadow)"/>
         <g id="secGroup" filter="url(#softShadow)">
@@ -438,7 +500,11 @@
     </div>
   </div>
 
-  <div class="col" style="align-items: stretch;">
+  <div class="indicators-col">
+    <div class="indicators-strip" id="indicatorsStrip"></div>
+  </div>
+
+  <div class="col col-calendari" style="align-items: stretch;">
     <div class="cal-header-row">
       <button type="button" class="ctrl-btn" id="themeBtn" aria-label="Canviar tema"></button>
       <div id="calHeader">
@@ -455,7 +521,7 @@
 
 </div>
 
-<div class="sound-hint" id="soundHint">Toca la pantalla per activar el so del cucut</div>
+<div class="sound-hint" id="soundHint">Toca la pantalla per activar el so de les campanes</div>
 
 <script>
 (function(){
@@ -504,6 +570,7 @@
     '06-24': 'Sant Joan',
     '08-15': "L'Assumpció",
     '09-11': 'Diada Nacional de Catalunya',
+    '10-01': "Dia de la República",
     '10-12': "Festa Nacional d'Espanya",
     '11-01': 'Tots Sants',
     '12-06': 'Dia de la Constitució',
@@ -714,6 +781,7 @@
       if (lastDay !== now.getDate()) {
         lastDay = now.getDate();
         buildCalendar(now);
+        actualitzaDiaEspecial(now);
       }
       checkHourlyChime(now);
       aplicarTemaAutomatic();
@@ -721,20 +789,112 @@
 
     requestAnimationFrame(frame);
   }
+
+  /* L'1 d'octubre, dia de la República, l'esfera ho mostra a la part baixa */
+  function actualitzaDiaEspecial(now) {
+    var esDiaEspecial = (now.getMonth() === 9 && now.getDate() === 1);
+    document.getElementById('republicaLinia1').textContent = esDiaEspecial ? '1-O' : '';
+    document.getElementById('republicaLinia2').textContent = esDiaEspecial ? 'Fem República!' : '';
+  }
+  actualitzaDiaEspecial(new Date());
+
   requestAnimationFrame(frame);
 
-  /* Temperatura, altitud i localització, a partir de la geolocalització del dispositiu */
-  var instTemp = document.getElementById('instTemp');
-  var instAlt = document.getElementById('altText');
-  var instLoc = document.getElementById('instLoc');
+  /* Poblacio, temperatura, alertes, humitat, sensacio tèrmica i altitud, a partir de la
+     geolocalització del dispositiu. Es mostren com una franja d'indicadors horitzontal i
+     desplaçable, entre el rellotge i el calendari. */
+  var dades = {
+    poblacio: null,
+    temp: null,
+    sensacio: null,
+    humitat: null,
+    altitud: null,
+    alertaPluja: false,
+    alertaNeu: false,
+    alertaBoira: false
+  };
   var lastCoords = null;
 
+  /* Classifica el codi de temps WMO (Open-Meteo) en una alerta senzilla de pluja, neu o boira.
+     Es basa nomes en l'observacio meteorologica actual d'Open-Meteo, no en avisos oficials. */
+  function aplicaAlertesTemps(code) {
+    dades.alertaBoira = (code === 45 || code === 48);
+    dades.alertaNeu = [71, 73, 75, 77, 85, 86].indexOf(code) !== -1;
+    dades.alertaPluja = [51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 99].indexOf(code) !== -1;
+  }
+
+  function renderIndicadors() {
+    var strip = document.getElementById('indicatorsStrip');
+    var items = [
+      { valor: dades.poblacio || '--', etiqueta: 'Població' },
+      { valor: dades.temp != null ? dades.temp + '°C' : '--', etiqueta: 'Temperatura' }
+    ];
+    if (dades.alertaPluja) items.push({ valor: 'Pluja', etiqueta: 'Alerta', alerta: true });
+    if (dades.alertaNeu) items.push({ valor: 'Neu', etiqueta: 'Alerta', alerta: true });
+    if (dades.alertaBoira) items.push({ valor: 'Boira', etiqueta: 'Alerta', alerta: true });
+    items.push({ valor: dades.humitat != null ? dades.humitat + '%' : '--', etiqueta: 'Humitat' });
+    items.push({ valor: dades.sensacio != null ? dades.sensacio + '°C' : '--', etiqueta: 'Sensació' });
+    items.push({ valor: dades.altitud != null ? dades.altitud + ' m' : '--', etiqueta: 'Altitud' });
+
+    strip.innerHTML = '';
+    items.forEach(function(it){
+      var chip = document.createElement('div');
+      chip.className = 'indicator-chip' + (it.alerta ? ' alerta' : '');
+      var valor = document.createElement('div');
+      valor.className = 'valor';
+      valor.textContent = it.valor;
+      var etiqueta = document.createElement('div');
+      etiqueta.className = 'etiqueta';
+      etiqueta.textContent = it.etiqueta;
+      chip.appendChild(valor);
+      chip.appendChild(etiqueta);
+      strip.appendChild(chip);
+    });
+    actualitzaFadeIndicadors();
+  }
+
+  /* Activa el difuminat a l'extrem on queden indicadors amagats */
+  function actualitzaFadeIndicadors() {
+    var strip = document.getElementById('indicatorsStrip');
+    var max = strip.scrollWidth - strip.clientWidth;
+    strip.classList.toggle('fade-l', strip.scrollLeft > 2);
+    strip.classList.toggle('fade-r', max > 2 && strip.scrollLeft < max - 2);
+  }
+  document.getElementById('indicatorsStrip').addEventListener('scroll', actualitzaFadeIndicadors, { passive: true });
+  window.addEventListener('resize', actualitzaFadeIndicadors);
+  renderIndicadors();
+
+  /* Arrossegar amb el mouse per desplaçar la franja (el dit ja funciona de manera nativa) */
+  (function initArrossegaIndicadors(){
+    var strip = document.getElementById('indicatorsStrip');
+    var actiu = false, x0 = 0, scrollInici = 0;
+    strip.addEventListener('pointerdown', function(e){
+      if (e.pointerType !== 'mouse') return;
+      actiu = true;
+      x0 = e.clientX;
+      scrollInici = strip.scrollLeft;
+      strip.classList.add('arrossegant');
+      strip.setPointerCapture(e.pointerId);
+    });
+    strip.addEventListener('pointermove', function(e){
+      if (!actiu) return;
+      strip.scrollLeft = scrollInici - (e.clientX - x0);
+    });
+    function fi(){ actiu = false; strip.classList.remove('arrossegant'); }
+    strip.addEventListener('pointerup', fi);
+    strip.addEventListener('pointercancel', fi);
+  })();
+
   function fetchWeather(lat, lon) {
-    fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon + '&current=temperature_2m&daily=sunrise,sunset&timezone=auto')
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon + '&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code&daily=sunrise,sunset&timezone=auto')
       .then(function(r){ return r.json(); })
       .then(function(data){
         if (data && data.current) {
-          instTemp.textContent = Math.round(data.current.temperature_2m) + '°C';
+          dades.temp = Math.round(data.current.temperature_2m);
+          dades.humitat = Math.round(data.current.relative_humidity_2m);
+          dades.sensacio = Math.round(data.current.apparent_temperature);
+          aplicaAlertesTemps(data.current.weather_code);
+          renderIndicadors();
         }
         if (data && data.daily && data.daily.sunrise && data.daily.sunset) {
           sortidaSol = new Date(data.daily.sunrise[0]);
@@ -750,7 +910,8 @@
       .then(function(r){ return r.json(); })
       .then(function(data){
         if (data && data.elevation && data.elevation.length) {
-          instAlt.textContent = Math.round(data.elevation[0]) + ' m';
+          dades.altitud = Math.round(data.elevation[0]);
+          renderIndicadors();
         }
       })
       .catch(function(){});
@@ -761,17 +922,8 @@
       .then(function(r){ return r.json(); })
       .then(function(data){
         if (data) {
-          var name = data.locality || data.city || data.principalSubdivision || data.countryName || '--';
-          instLoc.textContent = name;
-          instLoc.removeAttribute('textLength');
-          /* Si el nom es massa llarg per l'amplada disponible, el comprimim en lloc d'escurcar-lo */
-          try {
-            var maxLocW = 156;
-            if (instLoc.getComputedTextLength() > maxLocW) {
-              instLoc.setAttribute('textLength', maxLocW);
-              instLoc.setAttribute('lengthAdjust', 'spacingAndGlyphs');
-            }
-          } catch (e) {}
+          dades.poblacio = data.locality || data.city || data.principalSubdivision || data.countryName || '--';
+          renderIndicadors();
         }
       })
       .catch(function(){});
@@ -790,7 +942,8 @@
         lastCoords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
         /* Si el dispositiu proporciona altitud GPS real (mòbils amb GPS), la fem servir en lloc de l'elevació del terreny */
         if (pos.coords.altitude !== null && pos.coords.altitude !== undefined && !isNaN(pos.coords.altitude)) {
-          instAlt.textContent = Math.round(pos.coords.altitude) + ' m';
+          dades.altitud = Math.round(pos.coords.altitude);
+          renderIndicadors();
         } else {
           fetchElevation(lastCoords.lat, lastCoords.lon);
         }
@@ -1072,19 +1225,48 @@
   function temaActual() {
     return document.documentElement.getAttribute('data-theme') === 'light' ? 'clar' : 'fosc';
   }
+  /* Proper canvi natural de llum (sortida o posta de sol). Sense dades del lloc, 7:00 i 20:00. */
+  function properCanviLlum(ara) {
+    var sortida, posta;
+    if (sortidaSol && postaSol) {
+      sortida = new Date(ara.getFullYear(), ara.getMonth(), ara.getDate(), sortidaSol.getHours(), sortidaSol.getMinutes());
+      posta = new Date(ara.getFullYear(), ara.getMonth(), ara.getDate(), postaSol.getHours(), postaSol.getMinutes());
+    } else {
+      sortida = new Date(ara.getFullYear(), ara.getMonth(), ara.getDate(), 7, 0);
+      posta = new Date(ara.getFullYear(), ara.getMonth(), ara.getDate(), 20, 0);
+    }
+    if (ara < sortida) return sortida;
+    if (ara < posta) return posta;
+    sortida.setDate(sortida.getDate() + 1);
+    return sortida;
+  }
+
   function aplicarTemaAutomatic() {
-    var manual = null;
-    try { manual = localStorage.getItem('domaineTemaManual'); } catch (e) {}
-    if (manual === 'clar' || manual === 'fosc') return;
-    if (!sortidaSol || !postaSol) return;
+    var manual = null, fins = 0;
+    try {
+      manual = localStorage.getItem('domaineTemaManual');
+      fins = parseInt(localStorage.getItem('domaineTemaManualFins'), 10) || 0;
+    } catch (e) {}
     var ara = new Date();
+    if (manual === 'clar' || manual === 'fosc') {
+      if (fins && ara.getTime() < fins) return;
+      /* L'elecció manual ha caducat: tornem a l'automàtic */
+      try {
+        localStorage.removeItem('domaineTemaManual');
+        localStorage.removeItem('domaineTemaManualFins');
+      } catch (e) {}
+    }
+    if (!sortidaSol || !postaSol) return;
     aplicarTema((ara >= sortidaSol && ara < postaSol) ? 'clar' : 'fosc');
   }
   actualitzarIconaTema(temaActual());
   if (themeBtn) {
     themeBtn.addEventListener('click', function () {
       var nou = temaActual() === 'clar' ? 'fosc' : 'clar';
-      try { localStorage.setItem('domaineTemaManual', nou); } catch (e) {}
+      try {
+        localStorage.setItem('domaineTemaManual', nou);
+        localStorage.setItem('domaineTemaManualFins', String(properCanviLlum(new Date()).getTime()));
+      } catch (e) {}
       aplicarTema(nou);
     });
   }
