@@ -688,6 +688,15 @@
       cell.className = classes.join(' ');
       grid.appendChild(cell);
     }
+    /* Reserva sempre 6 files de setmana (42 caselles): així el calendari fa la mateixa
+       alçada tant si el mes en té 4, 5 o 6, i el rellotge no es mou en canviar de mes. */
+    var totalCaselles = 7 + 42;
+    while (grid.children.length < totalCaselles) {
+      var buida = document.createElement('div');
+      buida.className = 'buida';
+      buida.innerHTML = '&nbsp;';
+      grid.appendChild(buida);
+    }
   }
 
   /* Anima el canvi de mes (lliscament visual) i torna a construir el calendari */
