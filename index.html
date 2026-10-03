@@ -2,8 +2,18 @@
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rellotge estil estació suïssa</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Domaine</title>
+<meta name="description" content="Rellotge d'estació suïssa amb calendari, festius de Catalunya i dades meteorològiques.">
+<!-- App instal·lable (PWA) -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" id="metaThemeColor" content="#000000">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Domaine">
 <script>
 (function(){
   try {
@@ -17,6 +27,7 @@
       tema = (h >= 7 && h < 20) ? 'clar' : 'fosc';
     }
     document.documentElement.setAttribute('data-theme', tema === 'clar' ? 'light' : 'dark');
+    document.getElementById('metaThemeColor').setAttribute('content', tema === 'clar' ? '#f4f2ec' : '#000000');
   } catch (e) {}
 })();
 </script>
@@ -65,8 +76,16 @@
     align-items: center;
     justify-content: center;
     padding: clamp(0.5rem, 2vh, 1.5rem) clamp(0.75rem, 3vw, 1.5rem);
+    padding-top: max(clamp(0.5rem, 2vh, 1.5rem), env(safe-area-inset-top));
+    padding-bottom: max(clamp(0.5rem, 2vh, 1.5rem), env(safe-area-inset-bottom));
+    padding-left: max(clamp(0.75rem, 3vw, 1.5rem), env(safe-area-inset-left));
+    padding-right: max(clamp(0.75rem, 3vw, 1.5rem), env(safe-area-inset-right));
     box-sizing: border-box;
     min-height: 100dvh;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    overscroll-behavior: none;
   }
   .wrap {
     display: flex;
@@ -311,6 +330,10 @@
   @media (orientation: landscape) and (max-height: 500px) {
     body {
       padding: clamp(0.25rem, 1.2vh, 0.75rem) clamp(0.5rem, 2vw, 1rem);
+      padding-top: max(clamp(0.25rem, 1.2vh, 0.75rem), env(safe-area-inset-top));
+      padding-bottom: max(clamp(0.25rem, 1.2vh, 0.75rem), env(safe-area-inset-bottom));
+      padding-left: max(clamp(0.5rem, 2vw, 1rem), env(safe-area-inset-left));
+      padding-right: max(clamp(0.5rem, 2vw, 1rem), env(safe-area-inset-right));
     }
     .wrap {
       flex-direction: row;
@@ -464,12 +487,12 @@
         <circle cx="100" cy="100" r="93.4" fill="none" stroke="url(#bezelGrad)" stroke-width="2.2"/>
         <ellipse cx="62" cy="54" rx="50" ry="36" fill="url(#glassHi)" transform="rotate(-18 62 54)"/>
         <g id="ticks" filter="url(#softShadow)"></g>
-        <text x="100" y="48" text-anchor="middle" font-family="'Mondaine Helvetica', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.8" font-weight="500" letter-spacing="1.03" fill="#1c1c1c">MONDAINE</text>
+        <text x="100" y="48" text-anchor="middle" font-family="'Mondaine Helvetica', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.8" font-weight="500" letter-spacing="1.03" fill="#1c1c1c">DOMAINE</text>
         <g id="brandLogo" filter="url(#softShadow)">
           <rect x="73.25" y="53.65" width="11.2" height="7.7" fill="#d52b1e"/>
           <polygon points="78.85,55.05 78.85,59.95 73.95,57.5" fill="#ffffff"/>
           <polygon points="78.85,55.05 78.85,59.95 83.75,57.5" fill="#ffffff"/>
-          <text x="86.55" y="59.95" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="5.25" font-weight="700" letter-spacing="0.28" fill="#1c1c1c">SBB CFF FFS</text>
+          <text x="86.55" y="59.95" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="5.25" font-weight="700" letter-spacing="0.28" fill="#1c1c1c">PSS MNN XML</text>
         </g>
         <text id="republicaText" x="100" text-anchor="middle" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" fill="#1c1c1c">
           <tspan id="republicaLinia1" x="100" y="138" font-size="15" font-weight="800" letter-spacing="0.4"></tspan>
@@ -1226,6 +1249,8 @@
   }
   function aplicarTema(tema) {
     document.documentElement.setAttribute('data-theme', tema === 'clar' ? 'light' : 'dark');
+    var meta = document.getElementById('metaThemeColor');
+    if (meta) meta.setAttribute('content', tema === 'clar' ? '#f4f2ec' : '#000000');
     actualitzarIconaTema(tema);
   }
   function temaActual() {
@@ -1288,6 +1313,15 @@
     else requestLocationAndData();
   }, 15 * 60 * 1000);
 })();
+</script>
+
+<script>
+/* Registre del service worker: permet instal·lar l'app i obrir-la sense connexió */
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js').catch(function () {});
+  });
+}
 </script>
 
 </body>
