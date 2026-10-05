@@ -2,7 +2,7 @@
    - Fitxers de l'app: es guarden a la memoria cau per funcionar sense connexio.
    - index.html: primer xarxa (per rebre sempre l'ultima versio), i si no n'hi ha, la copia guardada.
    - APIs externes (temps, ubicacio, festius): sempre per xarxa, mai a la memoria cau. */
-var VERSIO = 'domaine-v5';
+var VERSIO = 'domaine-v6';
 var FITXERS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', function (e) {
