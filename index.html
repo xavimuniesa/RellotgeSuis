@@ -21,7 +21,7 @@
      Una tria manual dura fins al següent canvi automàtic. */
   try {
     var ara = new Date();
-    var manual = localStorage.getItem('TemaManual');
+    var manual = localStorage.getItem('domaineTemaManual');
     var fins = parseInt(localStorage.getItem('domaineTemaManualFins'), 10);
     if (!fins || Date.now() >= fins) manual = null;
     var tema = manual;
@@ -364,7 +364,6 @@
     transition: transform 0.45s cubic-bezier(.2,.8,.2,1), opacity 0.3s ease;
     overflow: hidden;
     pointer-events: none;
-    touch-action: none;
     user-select: none;
     -webkit-user-select: none;
     color: var(--color-calgrid);
@@ -389,13 +388,24 @@
   .fin-punt.actiu { width: 22px; background: var(--color-calhead); }
   .fin-tanca { width: 30px; height: 30px; box-shadow: none; }
   .fin-tanca svg { width: 60%; height: 60%; }
+  /* Les finestres es passen amb el desplaçament natiu del sistema (fluid i amb inèrcia),
+     i s'ajusten soles a cada finestra (scroll-snap) */
   .fin-pista {
     flex: 1;
     min-height: 0;
     display: flex;
-    transition: transform 0.4s cubic-bezier(.2,.8,.2,1);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
+  .fin-pista::-webkit-scrollbar { display: none; }
+  .fin-pista.arrossegant { scroll-snap-type: none; cursor: grabbing; }
   .finestra {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
     flex: 0 0 100%;
     min-width: 100%;
     min-height: 0;
@@ -425,12 +435,13 @@
   .fin-cos {
     flex: 1;
     min-height: 0;
+    overflow-x: hidden;
     overflow-y: auto;
-    overscroll-behavior: contain;
+    overscroll-behavior-x: auto;
+    overscroll-behavior-y: contain;
     scrollbar-width: none;
   }
   .fin-cos::-webkit-scrollbar { display: none; }
-  .fin-cos.scrollable { touch-action: pan-y; }
   /* Difuminat inferior quan hi ha més contingut a sota */
   .fin-cos.scrollable:not(.al-final) {
     -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent);
@@ -545,6 +556,50 @@
   .estat-prog { color: var(--color-dow); font-weight: 600; padding: 6px 0; }
   .estat-prog a { color: inherit; }
 
+  .noticies { display: flex; flex-direction: column; gap: clamp(6px, 1.8cqw, 10px); }
+  .noticia {
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(8px, 2.4cqw, 12px);
+    padding: clamp(8px, 2.2cqw, 12px) clamp(10px, 2.8cqw, 14px);
+    border-radius: 14px;
+    border: 1px solid var(--panel-vora);
+    background: var(--panel-fons);
+    color: var(--color-calgrid);
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+    transition: transform 0.12s ease, background 0.2s ease;
+  }
+  .noticia:active { transform: scale(0.98); }
+  .noticia:first-child { border-color: var(--accent); }
+  .noticia .num {
+    flex: none;
+    width: clamp(22px, 6cqw, 28px);
+    height: clamp(22px, 6cqw, 28px);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 0.82em;
+    font-weight: 800;
+    background: var(--boto-ple);
+    color: var(--boto-ple-text);
+  }
+  .noticia:first-child .num { background: var(--accent); color: var(--accent-text); }
+  .noticia .txt {
+    flex: 1;
+    min-width: 0;
+    font-size: clamp(13px, 3.8cqw, 17px);
+    font-weight: 650;
+    line-height: 1.28;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .noticia .ext { flex: none; color: var(--color-dow); margin-top: 2px; }
+  .noticia .ext svg { width: 14px; height: 14px; display: block; }
   .radios { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(6px, 2cqw, 10px); }
   @container (max-width: 330px) { .radios { grid-template-columns: repeat(2, 1fr); } }
   .radio {
@@ -799,12 +854,12 @@
         <circle id="dialBezel" cx="100" cy="100" r="93.4" fill="none" stroke="url(#bezelGrad)" stroke-width="2.2"/>
         <ellipse id="dialGlass" cx="62" cy="54" rx="50" ry="36" fill="url(#glassHi)" transform="rotate(-18 62 54)"/>
         <g id="ticks" filter="url(#softShadow)"></g>
-        <text id="brandText" x="100" y="48" text-anchor="middle" font-family="'Mondaine Helvetica', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.8" font-weight="500" letter-spacing="1.03" fill="#1c1c1c">MONDAINE</text>
+        <text id="brandText" x="100" y="48" text-anchor="middle" font-family="'Mondaine Helvetica', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.8" font-weight="500" letter-spacing="1.03" fill="#1c1c1c">DOMAINE</text>
         <g id="brandLogo" filter="url(#softShadow)">
           <rect x="73.25" y="53.65" width="11.2" height="7.7" fill="#d52b1e"/>
           <polygon points="78.85,55.05 78.85,59.95 73.95,57.5" fill="#ffffff"/>
           <polygon points="78.85,55.05 78.85,59.95 83.75,57.5" fill="#ffffff"/>
-          <text x="86.55" y="59.95" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="5.25" font-weight="700" letter-spacing="0.28" fill="#1c1c1c">SBB CFF FFS</text>
+          <text x="86.55" y="59.95" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="5.25" font-weight="700" letter-spacing="0.28" fill="#1c1c1c">PSS MNN XML</text>
         </g>
         <text id="republicaText" x="100" text-anchor="middle" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" fill="#1c1c1c">
           <tspan id="republicaLinia1" x="100" y="138" font-size="15" font-weight="800" letter-spacing="0.4"></tspan>
@@ -895,6 +950,13 @@
               <div class="via-etiqueta">Via lliure<small>7 h</small></div>
               <div class="via-lliure" id="llistaVia"><div class="estat-prog">Carregant…</div></div>
             </div>
+          </div>
+        </section>
+        <section class="finestra" data-nom="Notícies">
+          <h2 class="fin-titol">Notícies <small>ACN · Al minut</small></h2>
+          <div class="fin-cos">
+            <div class="noticies" id="llistaNoticies"><div class="estat-prog">Carregant titulars…</div></div>
+            <div class="peu-dades" id="noticiesPeu"></div>
           </div>
         </section>
         <section class="finestra" data-nom="Radiodirecta">
@@ -1141,7 +1203,7 @@
       if (!actiu) return;
       actiu = false;
       var dx = e.clientX - x0, dy = e.clientY - y0;
-      if (Date.now() - t0 > 900) return;
+      if (Date.now() - t0 > 1500) return;
       if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) {
         canviaMes(dx < 0 ? 1 : -1);
         suprimeixClic();
@@ -1257,20 +1319,37 @@
 
   function finestresObertes() { return colCal.classList.contains('obert'); }
 
-  function vesAFinestra(i) {
-    finIndex = Math.max(0, Math.min(seccions.length - 1, i));
-    finPista.style.transition = '';
-    finPista.style.transform = 'translateX(' + (-finIndex * 100) + '%)';
+  function actualitzaPunts() {
     var punts = finPunts.children;
     for (var k = 0; k < punts.length; k++) punts[k].classList.toggle('actiu', k === finIndex);
-    if (finIndex === 2) carregaProgrames(false);
   }
+  function enArribarAFinestra() {
+    var nom = seccions[finIndex].getAttribute('data-nom');
+    if (nom === 'La Competència') carregaProgrames(false);
+    if (nom === 'Notícies') carregaNoticies(false);
+  }
+  function vesAFinestra(i, suau) {
+    finIndex = Math.max(0, Math.min(seccions.length - 1, i));
+    finPista.scrollTo({ left: finIndex * finPista.clientWidth, behavior: suau === false ? 'auto' : 'smooth' });
+    actualitzaPunts();
+    enArribarAFinestra();
+  }
+  /* La finestra activa es dedueix del desplaçament (dit, trackpad o ratolí) */
+  var tempsScroll = null;
+  finPista.addEventListener('scroll', function(){
+    var w = finPista.clientWidth || 1;
+    var idx = Math.round(finPista.scrollLeft / w);
+    if (idx !== finIndex) { finIndex = idx; actualitzaPunts(); }
+    clearTimeout(tempsScroll);
+    tempsScroll = setTimeout(enArribarAFinestra, 150);
+  }, { passive: true });
+  window.addEventListener('resize', function(){ finPista.scrollLeft = finIndex * finPista.clientWidth; });
 
   function obreFinestres() {
     amagaFestiuTip();
     colCal.classList.add('obert');
     finestresEl.setAttribute('aria-hidden', 'false');
-    vesAFinestra(0);
+    vesAFinestra(0, false);
     renderUbicacio();
     renderTemps();
     requestAnimationFrame(marcaScrollables);
@@ -1284,64 +1363,64 @@
   document.getElementById('mesDades').addEventListener('click', obreFinestres);
   document.getElementById('finTanca').addEventListener('click', tancaFinestres);
 
-  /* Gestos dins les finestres: lateral per passar de finestra (segueix el dit),
-     cap amunt per tornar al calendari */
+  /* Gestos dins les finestres. El pas lateral és el desplaçament natiu (fluid amb el dit i el
+     trackpad); aquí només hi ha: lliscar cap amunt per tornar al calendari, i arrossegar amb
+     el ratolí (que el navegador no fa sol). */
   (function initGestosFinestres(){
-    var x0 = 0, y0 = 0, t0 = 0, actiu = false, mode = null, desDeCap = false, cos = null;
+    function potTancar(objectiu) {
+      if (objectiu.closest('.fin-cap, .fin-titol')) return true;
+      var cos = objectiu.closest('.fin-cos');
+      return !cos || cos.scrollHeight <= cos.clientHeight + 2;
+    }
+    /* Dit: els touch events arriben fins al final encara que el sistema hagi desplaçat */
+    var tx = 0, ty = 0, tt = 0, tObj = null;
+    finestresEl.addEventListener('touchstart', function(e){
+      var t = e.touches[0];
+      tx = t.clientX; ty = t.clientY; tt = Date.now(); tObj = e.target;
+    }, { passive: true });
+    finestresEl.addEventListener('touchend', function(e){
+      if (!tObj) return;
+      var t = e.changedTouches[0];
+      var dx = t.clientX - tx, dy = t.clientY - ty;
+      if (dy < -50 && Math.abs(dy) > Math.abs(dx) * 1.5 && Date.now() - tt < 1500 && potTancar(tObj)) {
+        tancaFinestres();
+        suprimeixClic();
+      }
+      tObj = null;
+    }, { passive: true });
+
+    /* Ratolí: arrossegar per passar finestres, o amunt per tancar */
+    var mx0 = 0, my0 = 0, sl0 = 0, mObj = null, mMode = null;
     finestresEl.addEventListener('pointerdown', function(e){
-      if (e.button > 0) return;
-      actiu = true; mode = null;
-      x0 = e.clientX; y0 = e.clientY; t0 = Date.now();
-      desDeCap = !!e.target.closest('.fin-cap, .fin-titol');
-      cos = e.target.closest('.fin-cos');
+      if (e.pointerType !== 'mouse' || e.button > 0) return;
+      mx0 = e.clientX; my0 = e.clientY; sl0 = finPista.scrollLeft; mObj = e.target; mMode = null;
     });
     window.addEventListener('pointermove', function(e){
-      if (!actiu) return;
-      var mx = e.clientX - x0, my = e.clientY - y0;
-      if (!mode) {
-        if (Math.abs(mx) > 8 && Math.abs(mx) > Math.abs(my)) mode = 'h';
-        else if (Math.abs(my) > 8) mode = 'v';
+      if (!mObj) return;
+      var dx = e.clientX - mx0, dy = e.clientY - my0;
+      if (!mMode) {
+        if (Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(dy)) { mMode = 'h'; finPista.classList.add('arrossegant'); }
+        else if (Math.abs(dy) > 6) mMode = 'v';
       }
-      if (mode === 'h') {
-        var vora = (finIndex === 0 && mx > 0) || (finIndex === seccions.length - 1 && mx < 0);
-        var desp = vora ? mx * 0.3 : mx;
-        finPista.style.transition = 'none';
-        finPista.style.transform = 'translateX(calc(' + (-finIndex * 100) + '% + ' + desp + 'px))';
-      }
+      if (mMode === 'h') finPista.scrollLeft = sl0 - dx;
     });
     window.addEventListener('pointerup', function(e){
-      if (!actiu) return;
-      actiu = false;
-      var mx = e.clientX - x0, my = e.clientY - y0;
-      if (mode === 'h') {
-        var llindar = Math.min(60, finestresEl.clientWidth * 0.18);
-        var nou = finIndex;
-        if (mx < -llindar) nou++;
-        else if (mx > llindar) nou--;
-        vesAFinestra(nou);
+      if (!mObj) return;
+      var dx = e.clientX - mx0, dy = e.clientY - my0;
+      if (mMode === 'h') {
+        finPista.classList.remove('arrossegant');
+        var llindar = Math.min(60, finPista.clientWidth * 0.15);
+        var desti = Math.round(sl0 / finPista.clientWidth);
+        if (dx < -llindar) desti++;
+        else if (dx > llindar) desti--;
+        vesAFinestra(desti);
         suprimeixClic();
-      } else if (mode === 'v' && my < -45 && Math.abs(my) > Math.abs(mx) * 1.3 && Date.now() - t0 < 900) {
-        var potTancar = desDeCap || !cos || cos.scrollHeight <= cos.clientHeight + 2;
-        if (potTancar) { tancaFinestres(); suprimeixClic(); }
+      } else if (mMode === 'v' && dy < -45 && Math.abs(dy) > Math.abs(dx) * 1.3 && potTancar(mObj)) {
+        tancaFinestres();
+        suprimeixClic();
       }
-      mode = null;
+      mObj = null; mMode = null;
     });
-    window.addEventListener('pointercancel', function(){
-      if (!actiu) return;
-      actiu = false;
-      if (mode === 'h') vesAFinestra(finIndex);
-      mode = null;
-    });
-    /* Trackpad del Mac: lliscament lateral amb dos dits */
-    var ultimaRoda = 0;
-    finestresEl.addEventListener('wheel', function(e){
-      if (Math.abs(e.deltaX) < 25 || Math.abs(e.deltaX) < Math.abs(e.deltaY)) return;
-      e.preventDefault();
-      var ara = Date.now();
-      if (ara - ultimaRoda < 500) return;
-      ultimaRoda = ara;
-      vesAFinestra(finIndex + (e.deltaX > 0 ? 1 : -1));
-    }, { passive: false });
   })();
 
   /* Teclat (Mac): ↓ obre, ← → passa finestres o mesos, ↑ / Esc torna al calendari */
@@ -1686,7 +1765,109 @@
   /* Es comprova cada 20 minuts, per recollir el programa del dia quan RAC1 el penja */
   setInterval(function(){ if (document.visibilityState === 'visible') carregaProgrames(true); }, 20 * 60 * 1000);
 
-  /* ---- Finestra 4: Radiodirecta ----
+
+  /* ---- Finestra: Notícies de l'ACN (secció «Al minut» de la portada d'acn.cat) ----
+     L'ACN no ofereix RSS. Es llegeix la portada, que ve generada al servidor, a través d'un
+     intermediari que permet la lectura des del navegador (CORS). Si cap no respon, es fa servir
+     Google Notícies filtrat per acn.cat. Es refresca cada 10 minuts. */
+  var ACN_URL = 'https://www.acn.cat/';
+  var INTERMEDIARIS = [
+    function(u){ return 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u); },
+    function(u){ return 'https://api.codetabs.com/v1/proxy/?quest=' + encodeURIComponent(u); },
+    function(u){ return 'https://corsproxy.io/?url=' + encodeURIComponent(u); }
+  ];
+  function ambTempsLimit(promesa, ms) {
+    return new Promise(function(resolve, reject){
+      var t = setTimeout(function(){ reject(new Error('temps')); }, ms);
+      promesa.then(function(v){ clearTimeout(t); resolve(v); }, function(e){ clearTimeout(t); reject(e); });
+    });
+  }
+  function netejaText(s) { return (s || '').replace(/\s+/g, ' ').trim(); }
+
+  function titularsDeLaPortada(html) {
+    var doc = new DOMParser().parseFromString(html, 'text/html');
+    var totsEnllacos = Array.prototype.slice.call(doc.querySelectorAll('a[href*="/new/"]'));
+    /* Si es troba el títol «Al minut», només els enllaços que hi ha a continuació */
+    var titol = Array.prototype.slice.call(doc.querySelectorAll('h1,h2,h3,h4,span,div,p')).filter(function(el){
+      return netejaText(el.textContent).toLowerCase() === 'al minut';
+    })[0];
+    var enllacos = titol ? totsEnllacos.filter(function(a){
+      return titol.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_FOLLOWING;
+    }) : totsEnllacos;
+    var vistos = {}, ordre = [];
+    enllacos.forEach(function(a){
+      var href = a.getAttribute('href') || '';
+      if (href.indexOf('http') !== 0) href = 'https://www.acn.cat' + (href.charAt(0) === '/' ? '' : '/') + href;
+      var text = netejaText(a.textContent);
+      if (text.length < 20) return;
+      if (!vistos[href]) { vistos[href] = text; ordre.push(href); }
+      else if (text.length > vistos[href].length) vistos[href] = text;
+    });
+    return ordre.slice(0, 3).map(function(h){ return { titol: vistos[h], url: h }; });
+  }
+
+  function titularsPerIntermediari(i) {
+    if (i >= INTERMEDIARIS.length) return Promise.reject(new Error('cap'));
+    return ambTempsLimit(fetch(INTERMEDIARIS[i](ACN_URL), { cache: 'no-store' }), 9000)
+      .then(function(r){ if (!r.ok) throw new Error('http'); return r.text(); })
+      .then(function(html){
+        var t = titularsDeLaPortada(html);
+        if (!t.length) throw new Error('buit');
+        return t;
+      })
+      .catch(function(){ return titularsPerIntermediari(i + 1); });
+  }
+
+  function titularsGoogle() {
+    var rss = 'https://news.google.com/rss/search?q=' + encodeURIComponent('site:acn.cat when:1d') + '&hl=ca&gl=ES&ceid=ES:ca';
+    return ambTempsLimit(fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(rss)), 9000)
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        var items = (j && j.items) || [];
+        if (!items.length) throw new Error('buit');
+        return items.slice(0, 3).map(function(it){
+          return { titol: netejaText(it.title).replace(/\s+-\s+(ACN|acn\.cat|Agència Catalana de Notícies)\s*$/i, ''), url: it.link };
+        });
+      });
+  }
+
+  var noticiesCarregades = 0, noticiesEnCurs = false;
+  function carregaNoticies(forcar) {
+    if (noticiesEnCurs) return;
+    if (!forcar && Date.now() - noticiesCarregades < 5 * 60 * 1000) return;
+    noticiesEnCurs = true;
+    var cont = document.getElementById('llistaNoticies');
+    titularsPerIntermediari(0).catch(titularsGoogle).then(function(titulars){
+      cont.innerHTML = '';
+      titulars.forEach(function(n, i){
+        var a = document.createElement('a');
+        a.className = 'noticia';
+        a.draggable = false;
+        a.href = n.url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.innerHTML = '<span class="num"></span><span class="txt"></span><span class="ext">' + ICONA_EXT + '</span>';
+        a.querySelector('.num').textContent = i + 1;
+        a.querySelector('.txt').textContent = n.titol;
+        cont.appendChild(a);
+      });
+      var ara = new Date();
+      document.getElementById('noticiesPeu').textContent = 'Agència Catalana de Notícies · actualitzat a les ' + pad2(ara.getHours()) + ':' + pad2(ara.getMinutes());
+      noticiesCarregades = Date.now();
+    }).catch(function(){
+      if (!noticiesCarregades) {
+        cont.innerHTML = '<div class="estat-prog">No s\'han pogut carregar els titulars. <a href="https://www.acn.cat/" target="_blank" rel="noopener">Obre acn.cat</a></div>';
+      }
+    }).then(function(){
+      noticiesEnCurs = false;
+      marcaScrollables();
+    });
+  }
+  carregaNoticies(true);
+  setInterval(function(){ if (document.visibilityState === 'visible') carregaNoticies(true); }, 10 * 60 * 1000);
+  document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'visible') carregaNoticies(false); });
+
+  /* ---- Finestra: Radiodirecta ----
      Es reprodueixen dins l'app; si una emissora no deixa, el següent toc obre la seva web. */
   var RADIOS = [
     { id: 'r-rac1', nom: 'RAC1', sub: 'Directe', audio: 'https://playerservices.streamtheworld.com/api/livestream-redirect/RAC_1.mp3', web: 'https://www.rac1.cat/' },
