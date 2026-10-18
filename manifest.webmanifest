@@ -1,18 +1,21 @@
 {
-  "name": "Domaine · Rellotge d'estació",
+  "name": "Domaine · Rellotge i calendari",
   "short_name": "Domaine",
-  "description": "Rellotge d'estació suïssa amb calendari, festius de Catalunya i dades meteorològiques.",
+  "description": "Rellotge d'estació suïssa amb calendari de festius de Catalunya, el temps, la qualitat de l'aire, alarmes, ràdio, podcasts i notícies.",
   "lang": "ca",
+  "dir": "ltr",
+  "id": "./",
   "start_url": "./",
   "scope": "./",
-  "display": "fullscreen",
-  "display_override": ["fullscreen", "standalone"],
+  "display": "standalone",
   "orientation": "any",
   "background_color": "#000000",
   "theme_color": "#000000",
+  "categories": ["utilities", "lifestyle"],
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
