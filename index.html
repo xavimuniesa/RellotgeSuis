@@ -5,7 +5,7 @@
   <!-- Sense traducció automàtica de Google ni del navegador: l'app ja té els seus idiomes -->
   <meta name="google" content="notranslate">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>MONDAINE · Rellotge i calendari</title>
+  <title>Domaine · Rellotge i calendari</title>
 
   <!-- App instal·lable (PWA) -->
   <link rel="manifest" href="manifest.webmanifest">
@@ -14,14 +14,14 @@
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="MONDAINE">
+  <meta name="apple-mobile-web-app-title" content="Domaine">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <script>
     /* Tema abans de pintar res (evita el parpelleig): Zz de 23 h a 7 h, de dia
        clar i de nit negre; si s'ha triat un tema amb el botó, aquell. */
     (function () {
       try {
-        var t = localStorage.getItem('MONDAINE_theme_override');
+        var t = localStorage.getItem('domaine_theme_override');
         if (t !== 'day' && t !== 'night' && t !== 'zz') {
           var h = new Date().getHours();
           t = (h >= 23 || h < 7) ? 'zz' : (h >= 7 && h < 20 ? 'day' : 'night');
@@ -38,7 +38,7 @@
       padding: 0;
     }
 
-    /* Temes de la MONDAINE: diürn (fons os), nocturn (negre) i Zz (negre i
+    /* Temes de la Domaine: diürn (fons os), nocturn (negre) i Zz (negre i
        taronja vermellós, com l'iPhone en repòs a la nit) */
     :root,
     html[data-theme="night"] {
@@ -250,7 +250,7 @@
       background: radial-gradient(circle, #242424 0%, #111111 70%, #080808 100%);
     }
 
-    /* Esfera MONDAINE (davant) i placa amb la bandera suïssa (darrere) */
+    /* Esfera Domaine (davant) i placa amb la bandera suïssa (darrere) */
     .clock-case {
       width: 100%;
       height: 100%;
@@ -1658,7 +1658,7 @@
       white-space: nowrap;
     }
 
-    /* ---- Aparença MONDAINE del calendari ---- */
+    /* ---- Aparença Domaine del calendari ---- */
     .month-year-title {
       font-size: 1.45rem;
       font-weight: 700;
@@ -1695,7 +1695,7 @@
       box-shadow: none;
     }
     .calendar-day-cell.other-month { opacity: 0.3; font-weight: 500; }
-    /* Botons de la capçalera en el to del text, com a la MONDAINE; el vermell queda
+    /* Botons de la capçalera en el to del text, com a la Domaine; el vermell queda
        per als festius, el darrer programa i l'idioma triat */
     .calendar-today-btn,
     .theme-toggle-btn { color: var(--month-title-color); }
@@ -2014,12 +2014,12 @@
 <body translate="no">
 
   <div class="app-container">
-    <!-- Secció Esquerra: rellotge MONDAINE (gira en tocar l'esfera i a les hores en punt) -->
+    <!-- Secció Esquerra: rellotge Domaine (gira en tocar l'esfera i a les hores en punt) -->
     <div class="watch-section">
       <div class="watch-flip-wrap">
         <div class="watch-container" id="watchFlip">
 
-          <!-- Cara davantera: esfera MONDAINE -->
+          <!-- Cara davantera: esfera Domaine -->
           <div class="watch-face-front">
             <div class="clock-case">
               <svg id="clock" viewBox="0 0 200 200" role="img" aria-label="Rellotge estil estació suïssa">
@@ -2047,7 +2047,7 @@
         <circle id="dialBezel" cx="100" cy="100" r="93.4" fill="none" stroke="url(#bezelGrad)" stroke-width="2.2"/>
         <ellipse id="dialGlass" cx="62" cy="54" rx="50" ry="36" fill="url(#glassHi)" transform="rotate(-18 62 54)"/>
         <g id="ticks" filter="url(#softShadow)"></g>
-        <text id="brandText" x="100" y="48" text-anchor="middle" font-family="'Mondaine Helvetica', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.8" font-weight="500" letter-spacing="1.03" fill="#1c1c1c">MONDAINE</text>
+        <text id="brandText" x="100" y="48" text-anchor="middle" font-family="'Mondaine Helvetica', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.8" font-weight="500" letter-spacing="1.03" fill="#1c1c1c">DOMAINE</text>
         <g id="brandLogo" filter="url(#softShadow)">
           <rect x="73.25" y="53.65" width="11.2" height="7.7" fill="#d52b1e"/>
           <polygon points="78.85,55.05 78.85,59.95 73.95,57.5" fill="#ffffff"/>
@@ -2060,11 +2060,14 @@
         </text>
         <rect id="hourHand" x="95.785" y="37" width="8.43" height="81" fill="#1c1c1c" filter="url(#softShadow)"/>
         <polygon id="minHand" points="96.07,118 96.07,100 96.33,8 103.68,8 103.93,100 103.93,118" fill="#1c1c1c" filter="url(#softShadow)"/>
+
+        <circle id="centreCap" cx="100" cy="100" r="5" fill="#1c1c1c" filter="url(#softShadow)"/>
+        <!-- Segundera: l'agulla de més amunt, amb l'eix en una petita circumferència vermella -->
         <g id="secGroup" filter="url(#softShadow)">
           <line x1="100" y1="118" x2="100" y2="30" stroke="#d0102a" stroke-width="2"/>
           <circle cx="100" cy="37" r="7" fill="#d0102a"/>
+          <circle cx="100" cy="100" r="3.4" fill="#d0102a"/>
         </g>
-        <circle id="centreCap" cx="100" cy="100" r="5" fill="#1c1c1c" filter="url(#softShadow)"/>
         </svg>
             </div>
           </div>
@@ -2273,7 +2276,7 @@
     // l'app surt d'aquí; t('clau', ...) retorna el text de l'idioma triat.
     // ------------------------------------------------------------------
     const LANGS = ['ca', 'fr', 'de', 'it', 'en'];
-    const LANG_STORAGE_KEY = 'MONDAINE_lang';
+    const LANG_STORAGE_KEY = 'domaine_lang';
     const WMO_CODES = [0, 1, 2, 3, 45, 48, 51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 71, 73, 75, 77, 80, 81, 82, 85, 86, 95, 96, 99];
 
     const I18N = {
@@ -2564,7 +2567,7 @@
     //     partir de regles fixes i de la data de Pasqua, i es reintenta
     //     al cap d'una hora.
     // ------------------------------------------------------------------
-    const HOLIDAYS_CACHE_KEY = 'MONDAINE_holidays_cache_v1';
+    const HOLIDAYS_CACHE_KEY = 'domaine_holidays_cache_v1';
     const HOLIDAYS_TTL_MS = 24 * 60 * 60 * 1000;   // dades de l'API: refresc diari
     const HOLIDAYS_RETRY_MS = 60 * 60 * 1000;      // reserva local: reintent cada hora
     const DEFAULT_MUNICIPALITY = 'Barcelona';
@@ -2842,11 +2845,11 @@
     }
 
     // ------------------------------------------------------------------
-    // Esfera MONDAINE: marques i agulles amb l'efecte "stop2go" dels rellotges
+    // Esfera Domaine: marques i agulles amb l'efecte "stop2go" dels rellotges
     // d'estació suïssos (la segundera fa la volta en 58 s i espera a les 12
     // l'impuls del canvi de minut, que llavors salta d'un cop).
     // ------------------------------------------------------------------
-    (function buildMONDAINETicks() {
+    (function buildDomaineTicks() {
       const ticks = document.getElementById('ticks');
       for (let i = 0; i < 60; i++) {
         const angle = i * 6 * Math.PI / 180;
@@ -2869,7 +2872,7 @@
     const domSecEl = document.getElementById('secGroup');
     let domLastSecond = -1;
 
-    function updateMONDAINE() {
+    function updateDomaine() {
       const now = new Date();
       const h = now.getHours() % 12;
       const m = now.getMinutes();
@@ -2883,7 +2886,7 @@
         checkDateChange(now);
         checkHourlyChime(now);
       }
-      requestAnimationFrame(updateMONDAINE);
+      requestAnimationFrame(updateDomaine);
     }
 
     // ------------------------------------------------------------------
@@ -3449,7 +3452,18 @@
         layer.style.transform = `translateZ(${z}px)`;
         watchFlipEl.insertBefore(layer, watchFlipEl.firstChild);
       }
-      watchFlipEl.addEventListener('click', () => { girRellotge(180, 5); });
+      // Toc a l'esfera: gira, mostra la bandera suïssa 3 segons i torna sola
+      // a l'esfera (sempre girant en el mateix sentit)
+      watchFlipEl.addEventListener('click', () => {
+        if (rellotgeGirant || ((grausRellotge / 180) % 2) !== 0) return;
+        girRellotge(180, 2.5, () => {
+          setTimeout(() => {
+            if (((grausRellotge / 180) % 2) === 0) return;
+            // si en aquell moment gira per l'hora en punt, torna en acabar
+            if (!girRellotge(180, 2.5)) girPendent = { graus: 180, segons: 2.5 };
+          }, 3000);
+        });
+      });
     })();
 
     // ------------------------------------------------------------------
@@ -3847,7 +3861,7 @@
 
     function appleClips(prog) {
       return new Promise((resolve, reject) => {
-        const cb = '__MONDAINEApple' + Date.now() + Math.floor(Math.random() * 1e5);
+        const cb = '__domaineApple' + Date.now() + Math.floor(Math.random() * 1e5);
         const s = document.createElement('script');
         const t = setTimeout(() => { cleanup(); reject(new Error('apple')); }, 12000);
         function cleanup() { clearTimeout(t); try { delete window[cb]; } catch (e) { window[cb] = undefined; } s.remove(); }
@@ -4326,7 +4340,7 @@
       }, nextMidnight - now);
     })();
 
-    requestAnimationFrame(updateMONDAINE);
+    requestAnimationFrame(updateDomaine);
 
     // ------------------------------------------------------------------
     // Temes: diürn, nocturn i Zz (nocturn negre i taronja, com el mode
@@ -4336,7 +4350,7 @@
     //  - Botó: des del mode automàtic recorre els altres dos temes i torna a
     //    automàtic; cada toc canvia el que es veu.
     // ------------------------------------------------------------------
-    const THEME_STORAGE_KEY = 'MONDAINE_theme_override'; // 'day' | 'night' | 'zz' | absent = automàtic
+    const THEME_STORAGE_KEY = 'domaine_theme_override'; // 'day' | 'night' | 'zz' | absent = automàtic
     const THEMES = ['day', 'night', 'zz'];
     const THEME_COLORS = { day: '#f4f2ec', night: '#000000', zz: '#000000' };
 
@@ -4398,14 +4412,15 @@
       }
     }
 
+    // Cicle del botó: automàtic → diürn fix → nocturn → Zz → automàtic
+    const THEME_CYCLE = [null, 'day', 'night', 'zz'];
     function cycleTheme() {
       const stored = getStoredTheme();
-      const auto = autoTheme();
-      const current = stored || auto;
-      const next = THEMES[(THEMES.indexOf(current) + 1) % THEMES.length];
-      if (stored && next === auto) setStoredTheme(null); // ha fet la volta: torna a automàtic
-      else setStoredTheme(next);
+      const next = THEME_CYCLE[(THEME_CYCLE.indexOf(stored) + 1) % THEME_CYCLE.length];
+      setStoredTheme(next);
       applyTheme();
+      const btn = document.getElementById('theme-toggle-btn');
+      if (btn) showToast(btn.title.replace(/\s*\([^)]*\)\s*$/, ''), 2200);
     }
 
     document.getElementById('theme-toggle-btn').addEventListener('click', (e) => {
@@ -4594,7 +4609,7 @@
     // Safari (iPhone) només deixa parlar després d'un primer toc a la
     // pantalla, i només mentre l'app és oberta i la pantalla encesa.
     // ------------------------------------------------------------------
-    const VOICE_STORAGE_KEY = 'MONDAINE_veu';
+    const VOICE_STORAGE_KEY = 'domaine_veu';
     const SPEAKER_ON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18.2 6.4a8 8 0 0 1 0 11.2"/></svg>';
     const SPEAKER_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>';
 
@@ -4906,7 +4921,7 @@
     // dita en veu alta, vibració si el telèfon en té, i botons per aturar
     // o posposar 5 minuts. Sonen encara que el so de l'altaveu sigui apagat.
     // ------------------------------------------------------------------
-    const ALARM_STORAGE_KEY = 'MONDAINE_alarms';
+    const ALARM_STORAGE_KEY = 'domaine_alarms';
     const ALARM_DEFAULTS = [
       { on: false, time: '07:00', days: [1, 2, 3, 4, 5] },
       { on: false, time: '08:00', days: [0, 6] },
@@ -5164,12 +5179,12 @@
     requestWakeLock();
 
     // ------------------------------------------------------------------
-    // Campanades de la MONDAINE: un Mi als quarts i tantes campanades de Do
+    // Campanades de la Domaine: un Mi als quarts i tantes campanades de Do
     // greu com marca l'hora a les hores en punt, mentre el rellotge fa una
     // volta sencera; un "cloc" mecànic quan s'atura. Sintetitzades amb Web
     // Audio (sense arxius). En mode Zz no sonen.
     // ------------------------------------------------------------------
-    const BELLS_STORAGE_KEY = 'MONDAINE_campanes';
+    const BELLS_STORAGE_KEY = 'domaine_campanes';
     const MI_FREQ = 329.63;
     const DO_FREQ = 261.63;
     const HORA_STEP = 0.85;
