@@ -6,7 +6,7 @@
 //   sempre van a la xarxa i l'app ja té la seva pròpia memòria per als festius.
 // Canvia CACHE_VERSION quan modifiquis els fitxers per forçar una còpia nova.
 
-const CACHE_VERSION = 'domaine-v16';
+const CACHE_VERSION = 'domaine-v17';
 const APP_SHELL = [
   './',
   './index.html',
