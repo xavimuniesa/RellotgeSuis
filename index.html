@@ -5,7 +5,7 @@
   <!-- Sense traducció automàtica de Google ni del navegador: l'app ja té els seus idiomes -->
   <meta name="google" content="notranslate">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>MONDAINE · Rellotge i calendari</title>
+  <title>Domaine · Rellotge i calendari</title>
 
   <!-- App instal·lable (PWA) -->
   <link rel="manifest" href="manifest.webmanifest">
@@ -14,24 +14,24 @@
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="MONDAINE">
+  <meta name="apple-mobile-web-app-title" content="Domaine">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <script>
     /* Tema abans de pintar res (evita el parpelleig): dia o nit segons l'hora; el Zz només si s'ha triat amb el botó. De dia
        clar i de nit negre; si s'ha triat un tema amb el botó, aquell. */
     (function () {
       try {
-        var t = localStorage.getItem('MONDAINE_theme_override');
+        var t = localStorage.getItem('domaine_theme_override');
         if (t !== 'day' && t !== 'night' && t !== 'zz' && t !== 'lume') {
           var h = new Date().getHours();
           t = (h >= 7 && h < 20) ? 'day' : 'night';
         }
         document.documentElement.setAttribute('data-theme', t);
-        var zz = localStorage.getItem('MONDAINE_zz_tone');
+        var zz = localStorage.getItem('domaine_zz_tone');
         var TONS = ['groc', 'verd', 'blau', 'vermell'], DUOS = ['mel', 'ambre', 'estacio', 'fanal', 'oasi', 'lliri', 'prat', 'terracota', 'jade', 'fumera', 'lagun', 'flamenc', 'pergami', 'estel', 'glacisol', 'constellacio', 'neogroc', 'esculla', 'primavera', 'grafit'];
         if (TONS.indexOf(zz) !== -1 || DUOS.indexOf(zz) !== -1) document.documentElement.setAttribute('data-zz', zz);
         if (DUOS.indexOf(zz) !== -1) document.documentElement.setAttribute('data-zzduo', '');
-        var llum = parseFloat(localStorage.getItem('MONDAINE_zz_llum'));
+        var llum = parseFloat(localStorage.getItem('domaine_zz_llum'));
         if (llum >= 0.2 && llum <= 1) document.documentElement.style.setProperty('--zz-llum', llum);
         document.getElementById('theme-color-meta').setAttribute('content', t === 'day' ? '#f4f2ec' : '#000000');
       } catch (e) {}
@@ -44,7 +44,7 @@
       padding: 0;
     }
 
-    /* Temes de la MONDAINE: diürn (fons os), nocturn (negre) i Zz (negre i
+    /* Temes de la Domaine: diürn (fons os), nocturn (negre) i Zz (negre i
        taronja vermellós, com l'iPhone en repòs a la nit) */
     :root,
     html[data-theme="night"] {
@@ -153,7 +153,7 @@
       --rain-color: var(--zzz-mig);
     }
 
-    /* Tons fosforescents del mode Zz (es canvien tocant l'esfera) */
+    /* Tons fosforescents del mode Zz (es canvien lliscant l'esfera a dreta o esquerra) */
     html[data-theme="zz"][data-zz="groc"] {
       --zzz: #a38e36; --zzz-mig: #726326; --zzz-dim: #4d4319; --zzz-fosc: #181508; --zzz-rgb: 163, 142, 54;
     }
@@ -191,8 +191,8 @@
     html[data-theme="lume"] #brandLogo polygon { fill: #000000; }
 
     /* Combinacions de dos colors del mode Zz: el principal (marques, segundera,
-       MONDAINE, números) i el secundari (agulles, festius, avui, l'any i la
-       temperatura grans). Es canvien tocant l'esfera, després dels tons sols. */
+       DOMAINE, números) i el secundari (agulles, festius, avui, l'any i la
+       temperatura grans). Es canvien lliscant l'esfera de costat, després dels tons sols. */
     html[data-theme="zz"][data-zz="mel"] {
       --zzz: #a38e36; --zzz-mig: #726326; --zzz-dim: #4d4319; --zzz-fosc: #181508; --zzz-rgb: 163, 142, 54;
       --zzb: #a34c36; --zzb-mig: #723526; --zzb-dim: #4d2419;
@@ -461,7 +461,7 @@
       background: radial-gradient(circle, #242424 0%, #111111 70%, #080808 100%);
     }
 
-    /* Esfera MONDAINE (davant) i placa amb la bandera suïssa (darrere) */
+    /* Esfera Domaine (davant) i placa amb la bandera suïssa (darrere) */
     .clock-case {
       width: 100%;
       height: 100%;
@@ -1973,7 +1973,7 @@
       white-space: nowrap;
     }
 
-    /* ---- Aparença MONDAINE del calendari ---- */
+    /* ---- Aparença Domaine del calendari ---- */
     .month-year-title {
       font-size: 1.45rem;
       font-weight: 700;
@@ -2010,7 +2010,7 @@
       box-shadow: none;
     }
     .calendar-day-cell.other-month { opacity: 0.3; font-weight: 500; }
-    /* Botons de la capçalera en el to del text, com a la MONDAINE; el vermell queda
+    /* Botons de la capçalera en el to del text, com a la Domaine; el vermell queda
        per als festius, el darrer programa i l'idioma triat */
     .calendar-today-btn,
     .theme-toggle-btn { color: var(--month-title-color); }
@@ -2336,12 +2336,12 @@
 <body translate="no">
 
   <div class="app-container">
-    <!-- Secció Esquerra: rellotge MONDAINE (gira en tocar l'esfera i a les hores en punt) -->
+    <!-- Secció Esquerra: rellotge Domaine (gira en tocar l'esfera i a les hores en punt) -->
     <div class="watch-section">
       <div class="watch-flip-wrap">
         <div class="watch-container" id="watchFlip">
 
-          <!-- Cara davantera: esfera MONDAINE -->
+          <!-- Cara davantera: esfera Domaine -->
           <div class="watch-face-front">
             <div class="clock-case">
               <svg id="clock" viewBox="0 0 200 200" role="img" aria-label="Rellotge estil estació suïssa">
@@ -2379,14 +2379,14 @@
         <circle id="dialBezel" cx="100" cy="100" r="93.4" fill="none" stroke="url(#bezelGrad)" stroke-width="2.2"/>
         <ellipse id="dialGlass" cx="62" cy="54" rx="50" ry="36" fill="url(#glassHi)" transform="rotate(-18 62 54)"/>
         <g id="ticks" filter="url(#softShadow)"></g>
-        <!-- MONDAINE i el sotalogo, una mica més avall -->
+        <!-- DOMAINE i el sotalogo, una mica més avall -->
         <g transform="translate(0 8)">
-        <text id="brandText" x="100" y="48" text-anchor="middle" font-family="'Mondaine Helvetica', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.8" font-weight="500" letter-spacing="1.03" fill="#1c1c1c">MONDAINE</text>
+        <text id="brandText" x="100" y="48" text-anchor="middle" font-family="'Mondaine Helvetica', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.8" font-weight="500" letter-spacing="1.03" fill="#1c1c1c">DOMAINE</text>
         <g id="brandLogo" filter="url(#softShadow)" transform="translate(0 -3.5)">
           <rect x="73.25" y="53.65" width="11.2" height="7.7" fill="#d52b1e"/>
           <polygon points="78.85,55.05 78.85,59.95 73.95,57.5" fill="#ffffff"/>
           <polygon points="78.85,55.05 78.85,59.95 83.75,57.5" fill="#ffffff"/>
-          <text x="86.55" y="59.95" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="5.25" font-weight="700" letter-spacing="0.28" fill="#1c1c1c">PUT ESP AÑA</text>
+          <text x="86.55" y="59.95" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="5.25" font-weight="700" letter-spacing="0.28" fill="#1c1c1c">PSS MNN XML</text>
         </g>
         </g>
         <text id="republicaText" x="100" text-anchor="middle" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" fill="#1c1c1c">
@@ -2623,7 +2623,7 @@
     // l'app surt d'aquí; t('clau', ...) retorna el text de l'idioma triat.
     // ------------------------------------------------------------------
     const LANGS = ['ca', 'fr', 'de', 'it', 'en'];
-    const LANG_STORAGE_KEY = 'MONDAINE_lang';
+    const LANG_STORAGE_KEY = 'domaine_lang';
     const WMO_CODES = [0, 1, 2, 3, 45, 48, 51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 71, 73, 75, 77, 80, 81, 82, 85, 86, 95, 96, 99];
 
     const I18N = {
@@ -2671,6 +2671,7 @@
         sleepAria: 'Temporitzador per apagar el so (toca per canviar)', sleepSet: n => `El so s'apagarà d'aquí a ${n} min`, sleepOff: 'Temporitzador desactivat', sleepDone: 'Temporitzador: so apagat',
         langGroup: 'Idioma',
         bellsOn: 'Campanades activades (toca per apagar-les)', bellsOff: 'Campanades apagades (toca per activar-les)', bellsTap: 'Toca la pantalla per activar el so de les campanes',
+        zzHint: "Llisca l'esfera a dreta o esquerra per canviar el color, i amunt o avall per la intensitat",
         zzTones: { taronja: 'taronja', groc: 'groc', verd: 'verd', blau: 'blau', vermell: 'vermell', mel: "Mel", ambre: "Nit d'ambre", estacio: "Estació", fanal: "Fanal", oasi: "Oasi", lliri: "Lliri", prat: "Prat", terracota: "Terracota", jade: "Jade", fumera: "Fumera", lagun: "Lagun", flamenc: "Flamenc", pergami: "Pergamí", estel: "Estel", glacisol: "Glaç i sol", constellacio: "Constel·lació", neogroc: "Neó groc", esculla: "Esculla", primavera: "Primavera", grafit: "Grafit" }, zzToneSet: n => `Mode Zz: ${n}`, zzLlum: n => `Intensitat ${n} %`,
         hello: 'Hola! Diré les hores en punt en català.'
       },
@@ -2718,6 +2719,7 @@
         sleepAria: 'Minuterie d\'arrêt du son (touchez pour changer)', sleepSet: n => `Le son s'arrêtera dans ${n} min`, sleepOff: 'Minuterie désactivée', sleepDone: 'Minuterie : son coupé',
         langGroup: 'Langue',
         bellsOn: 'Carillon activé (touchez pour le couper)', bellsOff: 'Carillon coupé (touchez pour l\'activer)', bellsTap: 'Touchez l\'écran pour activer le son du carillon',
+        zzHint: "Glissez le cadran à droite ou à gauche pour changer la couleur, et vers le haut ou le bas pour l'intensité",
         zzTones: { taronja: 'orange', groc: 'jaune', verd: 'vert', blau: 'bleu', vermell: 'rouge', mel: "Miel", ambre: "Nuit d'ambre", estacio: "Gare", fanal: "Lanterne", oasi: "Oasis", lliri: "Iris", prat: "Prairie", terracota: "Terre cuite", jade: "Jade", fumera: "Fumée", lagun: "Lagon", flamenc: "Flamant", pergami: "Parchemin", estel: "Étoile", glacisol: "Glace et soleil", constellacio: "Constellation", neogroc: "Néon jaune", esculla: "Récif", primavera: "Printemps", grafit: "Graphite" }, zzToneSet: n => `Mode Zz : ${n}`, zzLlum: n => `Intensité ${n} %`,
         hello: 'Bonjour ! J\'annoncerai les heures pile en français.'
       },
@@ -2765,6 +2767,7 @@
         sleepAria: 'Ausschalt-Timer (tippen zum Ändern)', sleepSet: n => `Der Ton geht in ${n} Min. aus`, sleepOff: 'Timer aus', sleepDone: 'Timer: Ton ausgeschaltet',
         langGroup: 'Sprache',
         bellsOn: 'Glockenschlag an (tippen zum Ausschalten)', bellsOff: 'Glockenschlag aus (tippen zum Einschalten)', bellsTap: 'Bildschirm antippen, um den Glockenschlag zu aktivieren',
+        zzHint: "Zifferblatt nach links oder rechts wischen, um die Farbe zu wechseln, nach oben oder unten für die Helligkeit",
         zzTones: { taronja: 'Orange', groc: 'Gelb', verd: 'Grün', blau: 'Blau', vermell: 'Rot', mel: "Honig", ambre: "Bernsteinnacht", estacio: "Bahnhof", fanal: "Laterne", oasi: "Oase", lliri: "Iris", prat: "Wiese", terracota: "Terrakotta", jade: "Jade", fumera: "Rauch", lagun: "Lagune", flamenc: "Flamingo", pergami: "Pergament", estel: "Stern", glacisol: "Eis und Sonne", constellacio: "Sternbild", neogroc: "Neongelb", esculla: "Riff", primavera: "Frühling", grafit: "Graphit" }, zzToneSet: n => `Zz-Modus: ${n}`, zzLlum: n => `Helligkeit ${n} %`,
         hello: 'Hallo! Ich sage die vollen Stunden auf Deutsch an.'
       },
@@ -2812,6 +2815,7 @@
         sleepAria: 'Timer di spegnimento (tocca per cambiare)', sleepSet: n => `L'audio si spegnerà tra ${n} min`, sleepOff: 'Timer disattivato', sleepDone: 'Timer: audio spento',
         langGroup: 'Lingua',
         bellsOn: 'Rintocchi attivi (tocca per spegnerli)', bellsOff: 'Rintocchi spenti (tocca per attivarli)', bellsTap: 'Tocca lo schermo per attivare il suono dei rintocchi',
+        zzHint: "Scorri il quadrante a destra o a sinistra per cambiare colore, e in su o in giù per l'intensità",
         zzTones: { taronja: 'arancione', groc: 'giallo', verd: 'verde', blau: 'blu', vermell: 'rosso', mel: "Miele", ambre: "Notte d'ambra", estacio: "Stazione", fanal: "Lanterna", oasi: "Oasi", lliri: "Iris", prat: "Prato", terracota: "Terracotta", jade: "Giada", fumera: "Fumo", lagun: "Laguna", flamenc: "Fenicottero", pergami: "Pergamena", estel: "Stella", glacisol: "Ghiaccio e sole", constellacio: "Costellazione", neogroc: "Neon giallo", esculla: "Scogliera", primavera: "Primavera", grafit: "Grafite" }, zzToneSet: n => `Modalità Zz: ${n}`, zzLlum: n => `Intensità ${n} %`,
         hello: 'Ciao! Annuncerò le ore in punto in italiano.'
       },
@@ -2859,6 +2863,7 @@
         sleepAria: 'Sleep timer (tap to change)', sleepSet: n => `Sound will switch off in ${n} min`, sleepOff: 'Sleep timer off', sleepDone: 'Sleep timer: sound off',
         langGroup: 'Language',
         bellsOn: 'Chimes on (tap to turn off)', bellsOff: 'Chimes off (tap to turn on)', bellsTap: 'Tap the screen to turn on the chime sound',
+        zzHint: "Swipe the dial left or right to change the colour, and up or down for brightness",
         zzTones: { taronja: 'orange', groc: 'yellow', verd: 'green', blau: 'blue', vermell: 'red', mel: "Honey", ambre: "Amber night", estacio: "Station", fanal: "Lantern", oasi: "Oasis", lliri: "Iris", prat: "Meadow", terracota: "Terracotta", jade: "Jade", fumera: "Smoke", lagun: "Lagoon", flamenc: "Flamingo", pergami: "Parchment", estel: "Star", glacisol: "Ice and sun", constellacio: "Constellation", neogroc: "Neon yellow", esculla: "Reef", primavera: "Spring", grafit: "Graphite" }, zzToneSet: n => `Zz mode: ${n}`, zzLlum: n => `Brightness ${n} %`,
         hello: 'Hello! I\'ll announce the time on the hour in English.'
       }
@@ -2924,7 +2929,7 @@
     //     partir de regles fixes i de la data de Pasqua, i es reintenta
     //     al cap d'una hora.
     // ------------------------------------------------------------------
-    const HOLIDAYS_CACHE_KEY = 'MONDAINE_holidays_cache_v1';
+    const HOLIDAYS_CACHE_KEY = 'domaine_holidays_cache_v1';
     const HOLIDAYS_TTL_MS = 24 * 60 * 60 * 1000;   // dades de l'API: refresc diari
     const HOLIDAYS_RETRY_MS = 60 * 60 * 1000;      // reserva local: reintent cada hora
     const DEFAULT_MUNICIPALITY = 'Barcelona';
@@ -3202,11 +3207,11 @@
     }
 
     // ------------------------------------------------------------------
-    // Esfera MONDAINE: marques i agulles amb l'efecte "stop2go" dels rellotges
+    // Esfera Domaine: marques i agulles amb l'efecte "stop2go" dels rellotges
     // d'estació suïssos (la segundera fa la volta en 58 s i espera a les 12
     // l'impuls del canvi de minut, que llavors salta d'un cop).
     // ------------------------------------------------------------------
-    (function buildMONDAINETicks() {
+    (function buildDomaineTicks() {
       const ticks = document.getElementById('ticks');
       for (let i = 0; i < 60; i++) {
         const angle = i * 6 * Math.PI / 180;
@@ -3239,8 +3244,8 @@
     let domUltimMinut = -1;
     let domUltimAngle = -1;
 
-    function updateMONDAINE(ts) {
-      requestAnimationFrame(updateMONDAINE);
+    function updateDomaine(ts) {
+      requestAnimationFrame(updateDomaine);
       const temaAra = document.documentElement.getAttribute('data-theme');
       const interval = (temaAra === 'zz' || temaAra === 'lume') ? 45 : 30;
       if (ts && ts - domUltimFotograma < interval) return;
@@ -3893,10 +3898,11 @@
       else document.documentElement.setAttribute('data-zz', tone);
       if (ZZ_DUOS.includes(tone)) document.documentElement.setAttribute('data-zzduo', '');
       else document.documentElement.removeAttribute('data-zzduo');
-      try { localStorage.setItem('MONDAINE_zz_tone', tone); } catch (e) {}
+      try { localStorage.setItem('domaine_zz_tone', tone); } catch (e) {}
     }
-    function cycleZzTone() {
-      const next = ZZ_TONES[(ZZ_TONES.indexOf(currentZzTone()) + 1) % ZZ_TONES.length];
+    function cycleZzTone(pas = 1) {
+      const n = ZZ_TONES.length;
+      const next = ZZ_TONES[(ZZ_TONES.indexOf(currentZzTone()) + pas + n) % n];
       setZzTone(next);
       showToast(t('zzToneSet', t('zzTones')[next]), 1600);
     }
@@ -3906,7 +3912,7 @@
     const ZZ_LLUM_MIN = 0.2;
     let zzLlum = 1;
     try {
-      const v = parseFloat(localStorage.getItem('MONDAINE_zz_llum'));
+      const v = parseFloat(localStorage.getItem('domaine_zz_llum'));
       if (v >= ZZ_LLUM_MIN && v <= 1) zzLlum = v;
     } catch (e) {}
     let zzLlumIgnoraClic = 0;
@@ -3921,7 +3927,7 @@
       ind.className = 'zz-llum';
       ind.innerHTML = '<div class="zz-llum-txt"></div><div class="zz-llum-barra"><i></i></div>';
       document.body.appendChild(ind);
-      let amagaTimer = null, actiu = false, arrossega = false, y0 = 0, llum0 = 1, alcada = 1;
+      let amagaTimer = null, actiu = false, arrossega = false, y0 = 0, x0 = 0, eix = null, llum0 = 1, alcada = 1;
 
       function mostra() {
         const pct = Math.round(zzLlum * 100);
@@ -3937,14 +3943,20 @@
 
       section.addEventListener('pointerdown', (e) => {
         if (!['zz', 'lume'].includes(document.documentElement.getAttribute('data-theme')) || e.button > 0) return;
-        actiu = true; arrossega = false; y0 = e.clientY; llum0 = zzLlum;
+        actiu = true; arrossega = false; eix = null; y0 = e.clientY; x0 = e.clientX; llum0 = zzLlum;
         alcada = watchFlipEl.getBoundingClientRect().height || 300;
       });
       window.addEventListener('pointermove', (e) => {
         if (!actiu) return;
         const dy = e.clientY - y0;
-        if (!arrossega && Math.abs(dy) < 8) return;
-        arrossega = true;
+        const dx = e.clientX - x0;
+        if (!eix) {
+          if (Math.max(Math.abs(dx), Math.abs(dy)) < 10) return;
+          // de costat: canvia el color (només en Zz); amunt o avall: intensitat
+          eix = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+          arrossega = true;
+        }
+        if (eix === 'x') return;
         // tot el recorregut (del mínim al màxim) en ~80 % de l'alçada del rellotge
         zzLlum = Math.max(ZZ_LLUM_MIN, Math.min(1, llum0 - dy / (alcada * 0.8)));
         aplicaZzLlum();
@@ -3955,11 +3967,20 @@
         actiu = false;
         if (arrossega) {
           zzLlumIgnoraClic = Date.now() + 400;
-          try { localStorage.setItem('MONDAINE_zz_llum', zzLlum.toFixed(3)); } catch (e) {}
-          amaga();
+          if (eix === 'y') {
+            try { localStorage.setItem('domaine_zz_llum', zzLlum.toFixed(3)); } catch (e) {}
+            amaga();
+          }
         }
       };
-      window.addEventListener('pointerup', fi);
+      window.addEventListener('pointerup', (e) => {
+        // lliscar l'esfera cap a l'esquerra porta el color següent; cap a la dreta, l'anterior
+        if (actiu && eix === 'x' && document.documentElement.getAttribute('data-theme') === 'zz') {
+          const dx = e.clientX - x0;
+          if (Math.abs(dx) >= 35) cycleZzTone(dx < 0 ? 1 : -1);
+        }
+        fi();
+      });
       window.addEventListener('pointercancel', fi);
     })();
 
@@ -3975,13 +3996,8 @@
       // Toc a l'esfera: gira, mostra la bandera suïssa 3 segons i torna sola
       // a l'esfera (sempre girant en el mateix sentit)
       watchFlipEl.addEventListener('click', () => {
-        // En mode Zz, el toc canvia el to: els cinc sols i després les combinacions de dos
-        if (document.documentElement.getAttribute('data-theme') === 'zz') {
-          if (Date.now() < zzLlumIgnoraClic) return;   // acaba de regular la intensitat
-          cycleZzTone();
-          return;
-        }
-        if (Date.now() < zzLlumIgnoraClic) return;   // acaba de regular la intensitat (mode lluminós)
+        // (en mode Zz el color es canvia lliscant l'esfera de costat, no amb el toc)
+        if (Date.now() < zzLlumIgnoraClic) return;   // acaba de lliscar (color o intensitat)
         if (rellotgeGirant || ((grausRellotge / 180) % 2) !== 0) return;
         girRellotge(180, 2.5, () => {
           setTimeout(() => {
@@ -4488,7 +4504,7 @@
 
     function appleClips(prog) {
       return new Promise((resolve, reject) => {
-        const cb = '__MONDAINEApple' + Date.now() + Math.floor(Math.random() * 1e5);
+        const cb = '__domaineApple' + Date.now() + Math.floor(Math.random() * 1e5);
         const s = document.createElement('script');
         const t = setTimeout(() => { cleanup(); reject(new Error('apple')); }, 12000);
         function cleanup() { clearTimeout(t); try { delete window[cb]; } catch (e) { window[cb] = undefined; } s.remove(); }
@@ -4815,6 +4831,7 @@
       const seg = document.getElementById('secGroup');
       seg.removeAttribute('filter');
       requestAnimationFrame(() => seg.setAttribute('filter', 'url(#softShadow)'));
+      if (tema === 'zz' && temaAnterior !== 'zz') showToast(t('zzHint'), 4500);
       temaAnterior = tema;
       updateTempGranVisible();
     }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
@@ -4983,7 +5000,7 @@
       }, nextMidnight - now);
     })();
 
-    requestAnimationFrame(updateMONDAINE);
+    requestAnimationFrame(updateDomaine);
 
     // ------------------------------------------------------------------
     // Temes: diürn, nocturn i Zz (nocturn negre i taronja, com el mode
@@ -4993,7 +5010,7 @@
     //  - Botó: des del mode automàtic recorre els altres dos temes i torna a
     //    automàtic; cada toc canvia el que es veu.
     // ------------------------------------------------------------------
-    const THEME_STORAGE_KEY = 'MONDAINE_theme_override'; // 'day' | 'night' | 'zz' | absent = automàtic
+    const THEME_STORAGE_KEY = 'domaine_theme_override'; // 'day' | 'night' | 'zz' | absent = automàtic
     const THEMES = ['day', 'night', 'lume', 'zz'];
     const THEME_COLORS = { day: '#f4f2ec', night: '#000000', lume: '#000000', zz: '#000000' };
 
@@ -5040,7 +5057,7 @@
     }
 
     // El mode Zz és del tot voluntari: només s'hi entra i se'n surt amb el botó del tema
-    try { localStorage.removeItem('MONDAINE_zz_retingut'); localStorage.removeItem('MONDAINE_zz_sortit'); } catch (e) {}
+    try { localStorage.removeItem('domaine_zz_retingut'); localStorage.removeItem('domaine_zz_sortit'); } catch (e) {}
 
     function autoTheme() {
       return isSunUp() ? 'day' : 'night';
@@ -5256,7 +5273,7 @@
     // Safari (iPhone) només deixa parlar després d'un primer toc a la
     // pantalla, i només mentre l'app és oberta i la pantalla encesa.
     // ------------------------------------------------------------------
-    const VOICE_STORAGE_KEY = 'MONDAINE_veu';
+    const VOICE_STORAGE_KEY = 'domaine_veu';
     const SPEAKER_ON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18.2 6.4a8 8 0 0 1 0 11.2"/></svg>';
     const SPEAKER_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>';
 
@@ -5584,7 +5601,7 @@
     // dita en veu alta, vibració si el telèfon en té, i botons per aturar
     // o posposar 5 minuts. Sonen encara que el so de l'altaveu sigui apagat.
     // ------------------------------------------------------------------
-    const ALARM_STORAGE_KEY = 'MONDAINE_alarms';
+    const ALARM_STORAGE_KEY = 'domaine_alarms';
     const ALARM_DEFAULTS = [
       { on: false, time: '07:00', days: [1, 2, 3, 4, 5] },
       { on: false, time: '08:00', days: [0, 6] },
@@ -5842,12 +5859,12 @@
     requestWakeLock();
 
     // ------------------------------------------------------------------
-    // Campanades de la MONDAINE: un Mi als quarts i tantes campanades de Do
+    // Campanades de la Domaine: un Mi als quarts i tantes campanades de Do
     // greu com marca l'hora a les hores en punt, mentre el rellotge fa una
     // volta sencera; un "cloc" mecànic quan s'atura. Sintetitzades amb Web
     // Audio (sense arxius). En mode Zz no sonen.
     // ------------------------------------------------------------------
-    const BELLS_STORAGE_KEY = 'MONDAINE_campanes';
+    const BELLS_STORAGE_KEY = 'domaine_campanes';
     const MI_FREQ = 329.63;
     const DO_FREQ = 261.63;
     const HORA_STEP = 0.85;
